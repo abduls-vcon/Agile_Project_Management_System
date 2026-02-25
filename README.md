@@ -1,73 +1,80 @@
-# React + TypeScript + Vite
+🚀 Agile Project Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern Agile Kanban Board Application built with React + TypeScript + Material UI (MUI).
+This system allows teams to manage projects, create user stories, assign priorities, and track progress across workflow stages.
 
-Currently, two official plugins are available:
+📌 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🗂 Project Management
 
-## React Compiler
+  Create and manage multiple projects
+  
+  Switch between projects dynamically
+  
+  View project-specific Kanban board
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+📋 User Story Management
 
-## Expanding the ESLint configuration
+  Add new user stories
+  
+  Edit and delete user stories
+  
+  Assign stories to users
+  
+  Drag & drop stories between statuses
+  
+  View story details in modal dialog
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+🏷 Workflow Stages
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+  Backlog
+  
+  In Progress
+  
+  Testing
+  
+  Completed
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+🎯 Priority Filtering
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+  Filter stories by:
+  
+  High
+  
+  Medium
+  
+  Low
+  
+  All
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Real-time filtering updates board instantly
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+👤 User Assignment
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+  Assign users to stories
+  
+  Display user avatar on story card
+  
+  Show only users working on that story
+
+🎨 UI/UX
+
+  Built with Material UI
+  
+  Animated cards
+  
+  Clean modern design
+  
+  Auto height adjustment based on content
+
+🛠 Tech Stack
+
+  React
+  
+  TypeScript
+  
+  Material UI (MUI)
+  
+  React Context API (State Management)
+  
+  Custom Drag & Drop Hook
