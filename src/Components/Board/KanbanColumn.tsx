@@ -29,7 +29,7 @@ const KanbanColumn: React.FC<Props> = ({ projectId, status, stories }) => {
       sx={{
         p: 2,
         minHeight: 500,
-        width: 330,
+        width: 290,
         backgroundColor: "rgba(255, 255, 255, 0.8)",
         backdropFilter: "blur(4px)",
       }}

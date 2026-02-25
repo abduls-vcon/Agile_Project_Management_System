@@ -8,7 +8,7 @@ import {
   MenuItem,
   FormControl,
 } from "@mui/material";
-import { blue} from "@mui/material/colors";
+import { blue, grey } from "@mui/material/colors";
 import Navbar from "../Components/Layout/Navbar";
 import Sidebar from "../Components/Layout/Sidebar";
 import InfoBar from "../Components/Layout/InfoBar";
@@ -77,6 +77,7 @@ const Board: React.FC = () => {
               py: 2,
               gap: 2,
               flexWrap: "wrap",
+              boxShadow: 2,
             }}
           >
             <FormControl size="small" sx={{ minWidth: 220 }}>
@@ -96,12 +97,12 @@ const Board: React.FC = () => {
 
             <Button
               sx={{
-                bgcolor: blue[100],
-                color: blue[700],
+                bgcolor: blue[700],
+                color: "#fff",
                 width: 150,
                 height: 45,
                 fontWeight: "bold",
-                "&:hover": { bgcolor: blue[200] },
+                "&:hover": { bgcolor: blue[800] },
               }}
               onClick={() => setIsModalOpen(true)}
             >
@@ -115,20 +116,24 @@ const Board: React.FC = () => {
               />
             )}
           </Box>
-
-          <Grid p={3} container spacing={2}>
+          <Box
+            sx={{
+              p: 3,
+              display: "flex",
+              overflowX: "auto",
+              gap: 2,
+              height: "calc(100vh - 170px)",
+            }}
+          >
             {STATUSES.map((status) => (
-              <Grid key={status} sx={{ xs: 12, md: 3 }}>
-                <KanbanColumn
-                  projectId={project.id}
-                  status={status}
-                  stories={project.userStories.filter(
-                    (s) => s.status === status
-                  )}
-                />
-              </Grid>
+              <KanbanColumn
+                key={status}
+                projectId={project.id}
+                status={status}
+                stories={project.userStories.filter((s) => s.status === status)}
+              />
             ))}
-          </Grid>
+          </Box>
         </Box>
       </Box>
     </Box>

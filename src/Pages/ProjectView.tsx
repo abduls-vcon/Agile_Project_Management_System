@@ -75,6 +75,7 @@ const ProjectView: React.FC = () => {
               px: 3,
               py: 2,
               bgcolor: grey[50],
+              justifyContent:"space-between",
               alignItems: "center",
             }}
           >

@@ -9,6 +9,7 @@ import {
   Stack,
   Divider,
 } from "@mui/material";
+import { Avatar, AvatarGroup } from "@mui/material";
 import { grey, green, blue, yellow } from "@mui/material/colors";
 import FreeCancellationSharpIcon from "@mui/icons-material/FreeCancellationSharp";
 import { Edit } from "@mui/icons-material";
@@ -47,7 +48,9 @@ const InfoBox: React.FC<InfoBoxProps> = ({
       display: "flex",
       flexDirection: "column",
       gap: 1,
-      width: "100%",
+      width: 140,
+      transition: "transform 0.3s",
+      "&:hover": { transform: "translateY(-3px)" },
     }}
   >
     <Typography
@@ -99,18 +102,27 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
     navigate(`/board/${project.id}`);
   }, [navigate, project.id]);
 
+  const assignedUserIds = Array.from(
+    new Set(project.userStories.map((story) => story.assignedTo)),
+  );
+
+  const assignedUsers = users.filter((user) =>
+    assignedUserIds.includes(user.id),
+  );
   return (
     <>
       <Card
         onDoubleClick={handleCardDoubleClick}
-        elevation={6}
+        elevation={8}
         sx={{
           width: 400,
-          height: 380,
-          borderRadius: 3,
+          height: 400,
+          borderRadius: 4,
           bgcolor: grey[50],
           border: `1px solid ${grey[200]}`,
           cursor: "pointer",
+          transition: "transform 0.3s, box-shadow 0.3s",
+          "&:hover": { transform: "translateY(-5px)", boxShadow: 10 },
         }}
       >
         <CardContent>
@@ -120,54 +132,81 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
             alignItems="center"
             mb={2}
           >
-            <Typography variant="h6" fontWeight={500} color={blue[700]}>
+            <Typography variant="h6" fontWeight={600} color={blue[700]}>
               {project.name}
             </Typography>
-            <Edit sx={{ cursor: "pointer" }} onClick={handleEditClick} />
+            <Edit
+              sx={{
+                cursor: "pointer",
+                color: blue[600],
+                "&:hover": { color: blue[800] },
+              }}
+              onClick={handleEditClick}
+            />
           </Box>
 
           <Divider sx={{ my: 2 }} />
-
           <Box display="flex" justifyContent="center">
             <Grid container spacing={2} justifyContent="center">
-              <Grid  sx={{ width: 170 }}>
+              <Grid sx={{ width: 170 }}>
                 <InfoBox
                   label="Status"
                   value={project.status}
                   bgColor={green[50]}
-                  borderColor={grey[200]}
+                  borderColor={green[200]}
                   color={green[700]}
                 />
               </Grid>
 
-              <Grid  sx={{ width: 170 }}>
+              <Grid sx={{ width: 170 }}>
                 <InfoBox
                   label="User Stories"
                   value={
-                    <Typography variant="h4" fontWeight="bold">
+                    <Typography
+                      variant="h5"
+                      fontWeight="bold"
+                      color={blue[700]}
+                    >
                       {project.userStories.length}
                     </Typography>
                   }
                   bgColor={blue[50]}
-                  borderColor={grey[200]}
-                  color={blue[600]}
+                  borderColor={blue[200]}
+                  color={blue[700]}
                 />
               </Grid>
 
-              <Grid  sx={{ width: 170 }}>
+              <Grid sx={{ width: 170 }}>
                 <InfoBox
                   label="Admin"
                   value={owner?.name ?? "—"}
                   bgColor={yellow[50]}
-                  borderColor={grey[200]}
+                  borderColor={yellow[200]}
                   color={yellow[800]}
                 />
               </Grid>
 
-              <Grid  sx={{ width: 170 }}>
+              <Grid sx={{ width: 170 }}>
                 <InfoBox
                   label="Users"
-                  value={users.length}
+                  value={
+                    <AvatarGroup max={3} sx={{ justifyContent: "flex-start" }}>
+                      {assignedUsers.map((user) => (
+                        <Avatar
+                          key={user.id}
+                          sx={{
+                            bgcolor: user.avatarColor,
+                            width: 40,
+                            height: 40,
+                            fontSize: 14,
+                            border: "2px solid white",
+                          }}
+                        >
+                          {user.name.charAt(0).toUpperCase()}
+                        </Avatar>
+                      ))}
+                    </AvatarGroup>
+                  }
                   bgColor="#fff"
                   borderColor={grey[200]}
                 />
@@ -183,7 +222,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
           >
             <Stack direction="row" spacing={1} alignItems="center">
               <FreeCancellationSharpIcon sx={{ color: green[400] }} />
-              <Typography variant="body2" fontWeight={500}>
+              <Typography variant="body2" fontWeight={500} color={grey[600]}>
                 {formattedCreated}
               </Typography>
             </Stack>

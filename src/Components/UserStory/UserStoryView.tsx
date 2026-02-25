@@ -55,20 +55,21 @@ const UserStoryView: React.FC<Props> = ({ story, projectId }) => {
     <Card
       sx={{
         boxShadow: 6,
+        borderRadius: 3,
         overflow: "hidden",
-        transition: "0.3s",
-        "&:hover": { boxShadow: 10 },
+        transition: "transform 0.3s, box-shadow 0.3s",
+        "&:hover": { boxShadow: 12, transform: "translateY(-3px)" },
       }}
     >
       <Box
         sx={{
           height: 6,
-          bgcolor: getStatusColor(),
+          background: `linear-gradient(90deg, ${getStatusColor()} 0%, ${getStatusColor()}90 100%)`,
         }}
       />
 
       <CardContent sx={{ p: 4 }}>
-        <Typography variant="h5" fontWeight={700} gutterBottom>
+        <Typography variant="h5" fontWeight={700} gutterBottom color="grey.800">
           {story.title}
         </Typography>
 
@@ -101,14 +102,17 @@ const UserStoryView: React.FC<Props> = ({ story, projectId }) => {
               bgcolor: getStatusColor(),
               color: "#fff",
               fontWeight: 600,
+              minWidth: 90,
             }}
           />
-
           <Chip
             label={story.priority}
             color={getPriorityColor()}
             variant="outlined"
-            sx={{ fontWeight: 600 }}
+            sx={{
+              fontWeight: 600,
+              minWidth: 90,
+            }}
           />
         </Stack>
 
@@ -126,19 +130,20 @@ const UserStoryView: React.FC<Props> = ({ story, projectId }) => {
             <Avatar
               sx={{
                 bgcolor: assignedUser.avatarColor,
-                width: 40,
-                height: 40,
+                width: 48,
+                height: 48,
                 fontWeight: 600,
+                fontSize: 18,
               }}
             >
               {assignedUser.name.charAt(0)}
             </Avatar>
 
             <Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="caption" color="text.secondary">
                 Assigned To
               </Typography>
-              <Typography fontWeight={600}>
+              <Typography fontWeight={600} color="grey.800">
                 {assignedUser.name}
               </Typography>
             </Box>

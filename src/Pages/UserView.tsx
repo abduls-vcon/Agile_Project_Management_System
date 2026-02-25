@@ -6,8 +6,8 @@ import {
   MenuItem,
   TextField,
   Button,
+  CircularProgress,
 } from "@mui/material";
-import { CircularProgress } from "@mui/material";
 import Navbar from "../Components/Layout/Navbar";
 import Sidebar from "../Components/Layout/Sidebar";
 import InfoBar from "../Components/Layout/InfoBar";
@@ -16,26 +16,23 @@ import AddUser from "./AddUser";
 import UserItems from "../Components/User/UserItems";
 import { useApp } from "../Context";
 
-
 const UserView: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [searchName, setSearchName] = useState("");
   const [selectedRole, setSelectedRole] = useState<"all" | string>("all");
-  const[loading,setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const { users } = useApp();
-  useEffect(()=>{
-    const timer = setTimeout(()=> setLoading(false),3000);
-    return ()=> clearTimeout(timer);
-  })
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1500); // shorter loading
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
-      const roleMatch =
-        selectedRole === "all" ? true : user.role === selectedRole;
-      const nameMatch = user.name
-        .toLowerCase()
-        .includes(searchName.toLowerCase());
+      const roleMatch = selectedRole === "all" ? true : user.role === selectedRole;
+      const nameMatch = user.name.toLowerCase().includes(searchName.toLowerCase());
       return roleMatch && nameMatch;
     });
   }, [users, selectedRole, searchName]);
@@ -63,16 +60,15 @@ const UserView: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               flexWrap: "wrap",
-              px: 2,
-              py: 1,
+              px: 3,
+              py: 2,
               gap: 2,
               bgcolor: grey[50],
               boxShadow: 2,
             }}
           >
-            <Typography sx={{ fontSize: 25, fontWeight: "medium" }}>
-              User List
-            </Typography>
+            <Typography sx={{ fontSize: 26, fontWeight: 600 }}>User List</Typography>
+
             <Box
               sx={{
                 display: "flex",
@@ -86,23 +82,16 @@ const UserView: React.FC = () => {
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
                 size="small"
-                sx={{ minWidth: 180, height: 45 }}
-                InputProps={{ sx: { height: 45 } }}
-                InputLabelProps={{ shrink: true }}
+                sx={{ minWidth: 200 }}
               />
 
-              <FormControl size="small" sx={{ minWidth: 180, height: 45 }}>
+              <FormControl size="small" sx={{ minWidth: 180 }}>
                 <TextField
                   select
                   value={selectedRole}
-                  onChange={(e) =>
-                    setSelectedRole(e.target.value as "all" | string)
-                  }
+                  onChange={(e) => setSelectedRole(e.target.value as "all" | string)}
                   label="Filter by Role"
                   size="small"
-                  sx={{ height: 45 }}
-                  InputProps={{ sx: { height: 45 } }}
-                  InputLabelProps={{ shrink: true }}
                 >
                   <MenuItem value="all">All Roles</MenuItem>
                   <MenuItem value="Developer">Developer</MenuItem>
@@ -113,12 +102,12 @@ const UserView: React.FC = () => {
 
               <Button
                 sx={{
-                  bgcolor: blue[100],
-                  color: blue[700],
-                  width: 150,
-                  height: 45,
-                  fontWeight: "bold",
-                  "&:hover": { bgcolor: blue[200] },
+                  bgcolor: blue[700],
+                  color: "#fff",
+                  width: 140,
+                  height: 40,
+                  fontWeight: 600,
+                  "&:hover": { bgcolor: blue[800] },
                 }}
                 onClick={() => setOpenDialog(true)}
               >
@@ -130,19 +119,15 @@ const UserView: React.FC = () => {
 
           <Box
             sx={{
-              p: 2,
+              p: 3,
               minHeight: 400,
               display: "flex",
-              justifyContent: "left",
-              alignItems: "top",
+              justifyContent: "center",
+              alignItems: "flex-start",
             }}
           >
             {loading ? (
-              <CircularProgress
-                size={60}
-                thickness={5}
-                sx={{ color: blue[700] }}
-              />
+              <CircularProgress size={60} thickness={5} sx={{ color: blue[700] }} />
             ) : (
               <UserItems users={filteredUsers} />
             )}

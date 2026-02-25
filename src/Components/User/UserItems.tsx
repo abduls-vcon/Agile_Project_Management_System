@@ -16,6 +16,7 @@ import {
   DialogActions,
   Button,
   MenuItem,
+  Stack,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -25,11 +26,8 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { blue, grey } from "@mui/material/colors";
 import { useApp } from "../../Context";
 
-
-
-
 interface UserItemsProps {
-  users:any[];
+  users: any[];
 }
 
 const roleIcon = (role: string) => {
@@ -45,7 +43,7 @@ const roleIcon = (role: string) => {
   }
 };
 
-const UserItems: React.FC <UserItemsProps>= ({users}) => {
+const UserItems: React.FC<UserItemsProps> = ({ users }) => {
   const { updateUser, deleteUser } = useApp();
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -85,31 +83,41 @@ const UserItems: React.FC <UserItemsProps>= ({users}) => {
     <Box sx={{ my: 1, p: 1 }}>
       <Grid container spacing={3} justifyContent="center">
         {users.map((user) => (
-          <Grid sx={{xs:12, sm:6, md:4, lg:2.4}} key={user.id}>
+          <Grid sx={{ xs: 12, sm: 6, md: 4, lg: 3, mx:1}} key={user.id}>
             <Card
               sx={{
                 display: "flex",
                 px: 2,
-                py: 1,
-                borderRadius: 2,
-                boxShadow: 8,
-                borderBottom: `4px solid ${blue[700]}`,
-                minHeight: 70,
-                width: 450,
+                py: 1.5,
+                borderRadius: 3,
+                boxShadow: 6,
+                borderLeft: `4px solid ${blue[700]}`,
+                height: 80,
+                width: 600,
+                transition: "transform 0.3s, box-shadow 0.3s",
+                "&:hover": { transform: "translateY(-3px)", boxShadow: 12 },
               }}
             >
               <ListItem
                 disableGutters
                 sx={{ display: "flex", alignItems: "center", width: "100%" }}
                 secondaryAction={
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <IconButton edge="end" aria-label="edit" onClick={() => handleOpen(user)}>
+                  <Stack direction="row" spacing={1}>
+                    <IconButton
+                      edge="end"
+                      aria-label="edit"
+                      onClick={() => handleOpen(user)}
+                    >
                       <EditIcon />
                     </IconButton>
-                    <IconButton edge="end" aria-label="delete" onClick={() => deleteUser(user.id)}>
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      onClick={() => deleteUser(user.id)}
+                    >
                       <DeleteIcon />
                     </IconButton>
-                  </Box>
+                  </Stack>
                 }
               >
                 <ListItemAvatar>
@@ -129,7 +137,7 @@ const UserItems: React.FC <UserItemsProps>= ({users}) => {
                 <ListItemText
                   sx={{ ml: 2 }}
                   primary={
-                    <Typography sx={{fontSize:18}} fontWeight="medium">
+                    <Typography sx={{ fontSize: 18 }} fontWeight="medium">
                       {user.name}
                     </Typography>
                   }
@@ -139,7 +147,8 @@ const UserItems: React.FC <UserItemsProps>= ({users}) => {
                     </Typography>
                   }
                 />
-                <Box sx={{ ml: "auto",mr:2, fontSize:8 }}>{roleIcon(user.role)}</Box>
+
+                <Box sx={{ ml: "auto", mr: 8 }}>{roleIcon(user.role)}</Box>
               </ListItem>
             </Card>
           </Grid>
@@ -182,7 +191,9 @@ const UserItems: React.FC <UserItemsProps>= ({users}) => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose} color="inherit">
+            Cancel
+          </Button>
           <Button onClick={handleUpdate} variant="contained">
             Update
           </Button>
