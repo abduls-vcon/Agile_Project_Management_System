@@ -1,14 +1,13 @@
 import React, { useState, useMemo } from "react";
 import {
   Box,
-  Grid,
   Typography,
   Button,
   TextField,
   MenuItem,
   FormControl,
 } from "@mui/material";
-import { blue, grey } from "@mui/material/colors";
+import { blue } from "@mui/material/colors";
 import Navbar from "../Components/Layout/Navbar";
 import Sidebar from "../Components/Layout/Sidebar";
 import InfoBar from "../Components/Layout/InfoBar";
@@ -29,6 +28,7 @@ const Board: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string>(
     projects.length > 0 ? projects[0].id : ""
   );
+  const [selectedPriority, setSelectedPriority] = useState<"all" | string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const project = useMemo(
@@ -50,6 +50,10 @@ const Board: React.FC = () => {
       </Box>
     );
   }
+
+  const priorities = Array.from(
+    new Set(project.userStories.map((s) => s.priority))
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -77,32 +81,50 @@ const Board: React.FC = () => {
               py: 2,
               gap: 2,
               flexWrap: "wrap",
-              boxShadow: 2,
             }}
           >
-            <FormControl size="small" sx={{ minWidth: 220 }}>
-              <TextField
-                select
-                value={selectedProjectId}
-                onChange={(e) => setSelectedProjectId(e.target.value)}
-                label="Project"
-              >
-                {projects.map((p) => (
-                  <MenuItem key={p.id} value={p.id}>
-                    {p.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </FormControl>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              <FormControl size="small" sx={{ minWidth: 220 }}>
+                <TextField
+                  select
+                  value={selectedProjectId}
+                  onChange={(e) => setSelectedProjectId(e.target.value)}
+                  label="Project"
+                >
+                  {projects.map((p) => (
+                    <MenuItem key={p.id} value={p.id}>
+                      {p.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </FormControl>
 
+              <FormControl size="small" sx={{ minWidth: 180 }}>
+                <TextField
+                  select
+                  value={selectedPriority}
+                  onChange={(e) => setSelectedPriority(e.target.value)}
+                  label="Priority"
+                >
+                  <MenuItem value="all">All Priorities</MenuItem>
+                  {priorities.map((priority) => (
+                    <MenuItem key={priority} value={priority}>
+                      {priority}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </FormControl>
+            </Box>
+
+            {/* Add Story Button */}
             <Button
               sx={{
-                bgcolor: blue[700],
-                color: "#fff",
+                bgcolor: blue[100],
+                color: blue[700],
                 width: 150,
                 height: 45,
                 fontWeight: "bold",
-                "&:hover": { bgcolor: blue[800] },
+                "&:hover": { bgcolor: blue[200] },
               }}
               onClick={() => setIsModalOpen(true)}
             >
@@ -118,11 +140,11 @@ const Board: React.FC = () => {
           </Box>
           <Box
             sx={{
-              p: 3,
               display: "flex",
-              overflowX: "auto",
               gap: 2,
-              height: "calc(100vh - 170px)",
+              px: 3,
+              py: 2,
+              overflowX: "auto",
             }}
           >
             {STATUSES.map((status) => (
@@ -130,7 +152,12 @@ const Board: React.FC = () => {
                 key={status}
                 projectId={project.id}
                 status={status}
-                stories={project.userStories.filter((s) => s.status === status)}
+                priority={selectedPriority}
+                stories={project.userStories.filter(
+                  (s) =>
+                    s.status === status &&
+                    (selectedPriority === "all" ? true : s.priority === selectedPriority)
+                )}
               />
             ))}
           </Box>

@@ -1,19 +1,22 @@
 import React, { useState } from "react";
-import { Card, CardContent, Typography, Chip, Box, Dialog, Stack } from "@mui/material";
+import {Box, Card, CardContent, Typography, Chip, Dialog, Stack } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { useApp } from "../../Context";
 import type { UserStory } from "../../Models";
 import { useDragDrop } from "../../Hooks/useDragDrop";
 import Avatar from "../Layout/Avatar";
 import UserStoryView from "./UserStoryView";
+import { Delete } from "@mui/icons-material";
+
 
 interface Props {
   story: UserStory;
   projectId: string;
+  priority?:string
 }
 
-const UserStoryCard: React.FC<Props> = ({ story, projectId }) => {
-  const { users } = useApp();
+const UserStoryCard: React.FC<Props> = ({ story, projectId}) => {
+  const { users, deleteUserStory } = useApp();
   const { onDragStart } = useDragDrop();
   const [open, setOpen] = useState(false);
 
@@ -48,9 +51,14 @@ const UserStoryCard: React.FC<Props> = ({ story, projectId }) => {
         }}
       >
         <CardContent>
-          <Typography variant="subtitle1" fontWeight="bold" color={grey[800]} gutterBottom>
+          <Box sx={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+            <Typography variant="subtitle1" fontWeight="bold" color={grey[800]} gutterBottom>
             {story.title}
           </Typography>
+          <Box sx={{display:"flex", justifyContent:"space-between", alignItems:"center", gap:3}}>
+            <Delete sx={{color:grey[500]}} onClick={() => deleteUserStory(projectId,story.id)}/>
+          </Box>
+          </Box>
           <Typography variant="body2" sx={{ mb: 2, color: grey[600], minHeight: 40 }}>
             {story.description}
           </Typography>
@@ -61,7 +69,7 @@ const UserStoryCard: React.FC<Props> = ({ story, projectId }) => {
               color={getPriorityColor(story.priority)}
               sx={{ fontWeight: 600 }}
             />
-            {assignedUser && <Avatar user={assignedUser} size={36} />}
+            {assignedUser && <Avatar user={assignedUser} size={36} />} 
           </Stack>
         </CardContent>
       </Card>

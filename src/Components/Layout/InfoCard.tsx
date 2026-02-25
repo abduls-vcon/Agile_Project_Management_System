@@ -1,6 +1,5 @@
 import React from "react";
-import { Card, CardContent, Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import { grey } from "@mui/material/colors";
+import {Box, Paper, Grid, Typography } from "@mui/material";
 
 interface InfoCardProps {
   title: string;
@@ -9,83 +8,38 @@ interface InfoCardProps {
   color?: string;
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({
-  title,
-  total,
-  icon,
-  color = "#1976d2",
-}) => {
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // breakpoint for stacking
-
+const InfoCard: React.FC<InfoCardProps> = ({ color, icon, total, title }) => {
   return (
-    <Card
-      elevation={8}
-      sx={{
-        flex: "1 1 20%",
-        width:220,
-        borderRadius: 4,
-        border: "1px solid",
-        borderColor: grey[200],
-        background: "linear-gradient(145deg, #ffffff, #f0f3f8)",
-        transition: "transform 0.3s, box-shadow 0.3s",
-        "&:hover": {
-          transform: "translateY(-6px)",
-          boxShadow: "0 12px 25px rgba(0,0,0,0.15)",
-        },
-        cursor: "pointer",
-        m:3.3 
-      }}
-    >
-      <CardContent
+    <Grid sx={{xs:12, sm:6, md:4, lg:2}}>
+      <Paper
         sx={{
+          m: 1,
           display: "flex",
-          flexDirection: isSmallScreen ? "column" : "row",
+          flexDirection: "column",
           alignItems: "center",
-          gap: 1,
-          height: "100%",
+          justifyContent: "center",
+          p: 3,
+          borderRadius: 3,
+          bgcolor: color,
+          color: "#fff",
+          height: 140,
+          width: 140,
+          transition: "transform 0.3s, box-shadow 0.3s",
+          "&:hover": { transform: "translateY(-5px)", boxShadow: 8 },
         }}
       >
-        {icon && (
-          <Box
-            sx={{
-              width: 70,
-              height: 70,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              bgcolor: `${color}33`,
-              color: color,
-              fontSize: isSmallScreen ? 28 : 36,
-              boxShadow: `0 4px 15px ${color}33`,
-              mb: isSmallScreen ? 2 : 0,
-            }}
-          >
-            {icon}
-          </Box>
-        )}
-
-        <Box sx={{ flex: 1, textAlign: "center" }}>
-          <Typography
-            variant="subtitle2"
-            fontWeight={600}
-            color="text.secondary"
-            sx={{ textTransform: "uppercase", letterSpacing: 1 }}
-          >
-            {title}
-          </Typography>
-
-          <Typography
-            variant={"h4"}
-            fontWeight="bold"
-            sx={{ mt: 1, color: color }}
-          >
-            {total}
-          </Typography>
-        </Box>
-      </CardContent>
-    </Card>
+        {icon && <Box mb={1}>{icon}</Box>}
+        <Typography variant="h5" fontWeight={700}>
+          {total}
+        </Typography>
+        <Typography
+          variant="subtitle2"
+          sx={{ textTransform: "uppercase", opacity: 0.8, textAlign: "center" }}
+        >
+          {title}
+        </Typography>
+      </Paper>
+    </Grid>
   );
 };
 

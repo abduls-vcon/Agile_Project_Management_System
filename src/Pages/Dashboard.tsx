@@ -2,8 +2,6 @@ import React from "react";
 import Navbar from "../Components/Layout/Navbar";
 import Sidebar from "../Components/Layout/Sidebar";
 import InfoBar from "../Components/Layout/InfoBar";
-import InfoCard from "../Components/Layout/InfoCard";
-
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import { BugReport, DeveloperBoard, ManageAccounts } from "@mui/icons-material";
@@ -12,6 +10,7 @@ import { Box, Grid, Typography, Paper } from "@mui/material";
 import { blue, green, yellow, grey, red, purple } from "@mui/material/colors";
 
 import { useApp } from "../Context";
+import InfoCard from "../Components/Layout/InfoCard";
 
 const Dashboard: React.FC = () => {
   const { users, projects } = useApp();
@@ -36,34 +35,8 @@ const Dashboard: React.FC = () => {
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflowY: "auto", p: 3 }}>
           <InfoBar />
           <Grid container spacing={9} sx={{display:'flex',justifyContent:'center',pt:3}}>
-            {dashboardCards.map((card, index) => (
-              <Grid key={index} sx={{xs:12, sm:6, md:4, lg:2}}>
-                <Paper
-                  sx={{
-                    m:1,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    p: 3,
-                    borderRadius: 3,
-                    bgcolor: card.color,
-                    color: "#fff",
-                    height: 140,
-                    width:140,
-                    transition: "transform 0.3s, box-shadow 0.3s",
-                    "&:hover": { transform: "translateY(-5px)", boxShadow: 8 },
-                  }}
-                >
-                  {card.icon}
-                  <Typography variant="h5" fontWeight={700} mt={1}>
-                    {card.total}
-                  </Typography>
-                  <Typography variant="subtitle2" sx={{ textTransform: "uppercase", opacity: 0.8 }}>
-                    {card.title}
-                  </Typography>
-                </Paper>
-              </Grid>
+            {dashboardCards.map((card) => (
+              <InfoCard title={card.title} total={card.total} icon={card.icon} color={card.color}/>
             ))}
           </Grid>
           <Box sx={{ mt: 4 }}>

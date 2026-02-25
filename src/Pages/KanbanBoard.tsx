@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Box, Grid, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Typography,
+  Button,
+  FormControl,
+  TextField,
+  MenuItem,
+} from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useApp } from "../Context";
 import KanbanColumn from "../Components/Board/KanbanColumn";
@@ -22,13 +30,20 @@ const STATUSES: UserStoryStatus[] = [
 const KanbanBoard: React.FC = () => {
   const { id } = useParams();
   const { projects } = useApp();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedPriority, setSelectedPriority] = useState<"all" | string>(
+    "all",
+  );
 
   const project = projects.find((p) => p.id === id);
 
   if (!project) {
     return <ErrorComponent title="Page Not Found" />;
   }
+
+  const priorities = Array.from(
+    new Set(project.userStories.map((s) => s.priority)),
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -45,6 +60,25 @@ const KanbanBoard: React.FC = () => {
           }}
         >
           <InfoBar />
+          <Box
+            sx={{ bgcolor: grey[50], width: "98%", height: 50, px: 2, py: 2 }}
+          >
+            <FormControl size="small" sx={{ minWidth: 200 }}>
+              <TextField
+                select
+                value={selectedPriority}
+                onChange={(e) => setSelectedPriority(e.target.value)}
+                label="Priority"
+              >
+                <MenuItem value="all">All Priorities</MenuItem>
+                {priorities.map((priority) => (
+                  <MenuItem key={priority} value={priority}>
+                    {priority}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </FormControl>
+          </Box>
           <Box>
             <Box
               sx={{
@@ -56,7 +90,11 @@ const KanbanBoard: React.FC = () => {
                 py: 1,
               }}
             >
-              <Typography sx={{fontSize:25, fontWeight:"bold", color:grey}}>{project.name} Board</Typography>
+              <Typography
+                sx={{ fontSize: 25, fontWeight: "bold", color: grey }}
+              >
+                {project.name} Board
+              </Typography>
               <Button
                 sx={{
                   bgcolor: blue[100],
@@ -88,8 +126,13 @@ const KanbanBoard: React.FC = () => {
                     projectId={project.id}
                     status={status}
                     stories={project.userStories.filter(
-                      (s) => s.status === status,
+                      (s) =>
+                        s.status === status &&
+                        (selectedPriority === "all"
+                          ? true
+                          : s.priority === selectedPriority),
                     )}
+                    priority={selectedPriority}
                   />
                 </Grid>
               ))}

@@ -11,6 +11,7 @@ interface Props {
   projectId: string;
   status: UserStoryStatus;
   stories: UserStory[];
+  priority?:string
 }
 
 const KanbanColumn: React.FC<Props> = ({ projectId, status, stories }) => {
@@ -28,18 +29,28 @@ const KanbanColumn: React.FC<Props> = ({ projectId, status, stories }) => {
       elevation={3}
       sx={{
         p: 2,
-        minHeight: 500,
-        width: 290,
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        width: 280,
+        minWidth: 280,
+        backgroundColor: "rgba(255,255,255,0.9)",
         backdropFilter: "blur(4px)",
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "80vh",
+        overflowY: "auto",
+        height: "auto", 
       }}
     >
       <Typography variant="h6" gutterBottom>
         {status}
       </Typography>
+
       <Box display="flex" flexDirection="column" gap={2}>
         {stories.map((story) => (
-          <UserStoryCard key={story.id} story={story} projectId={projectId} />
+          <UserStoryCard
+            key={story.id}
+            story={story}
+            projectId={projectId}
+          />
         ))}
       </Box>
     </Paper>

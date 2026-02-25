@@ -23,7 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CodeIcon from "@mui/icons-material/Code";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import { blue, grey } from "@mui/material/colors";
+import { blue} from "@mui/material/colors";
 import { useApp } from "../../Context";
 
 interface UserItemsProps {
