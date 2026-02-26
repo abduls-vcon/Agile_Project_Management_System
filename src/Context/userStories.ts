@@ -1,4 +1,3 @@
-// src/Context/userStories.ts
 import type { UserStory, Project, UserStoryStatus } from "../Models";
 
 export const addUserStory = (projects: Project[], setProjects: Function, projectId: string, story: UserStory) => {
