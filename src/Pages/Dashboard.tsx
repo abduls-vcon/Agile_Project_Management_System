@@ -4,7 +4,7 @@ import Sidebar from "../Components/Layout/Sidebar";
 import InfoBar from "../Components/Layout/InfoBar";
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
-import { BugReport, DeveloperBoard, ManageAccounts } from "@mui/icons-material";
+import { BugReport, DeveloperBoard, Info, ManageAccounts } from "@mui/icons-material";
 
 import { Box, Grid, Typography, Paper } from "@mui/material";
 import { blue, green, yellow, grey, red, purple } from "@mui/material/colors";
@@ -55,8 +55,8 @@ const Dashboard: React.FC = () => {
                 "&:hover": { boxShadow: 8 },
               }}
             >
-              <Typography variant="h3" sx={{ color: grey[300], mb: 2 }}>
-                🛈
+              <Typography variant="h3" sx={{ color: grey[300], mb: 1 }}>
+                <Info sx={{fontSize:50}}/>
               </Typography>
               <Typography variant="h6" fontWeight={500} color={grey[400]}>
                 No Updates

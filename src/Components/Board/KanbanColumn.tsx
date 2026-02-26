@@ -4,17 +4,16 @@ import UserStoryCard from "../UserStory/UserStoryCard";
 import { useApp } from "../../Context";
 import type { UserStory } from "../../Models";
 import { useDragDrop } from "../../Hooks/useDragDrop";
+import type { UserStoryStatus } from "../../Models";
 
-type UserStoryStatus = "Backlog" | "In Progress" | "Testing" | "Completed";
-
-interface Props {
+interface KanbanProps {
   projectId: string;
   status: UserStoryStatus;
   stories: UserStory[];
   priority?:string
 }
 
-const KanbanColumn: React.FC<Props> = ({ projectId, status, stories }) => {
+const KanbanColumn: React.FC<KanbanProps> = ({ projectId, status, stories }) => {
   const { updateUserStoryStatus } = useApp();
   const { onDragOver, onDrop } = useDragDrop();
 

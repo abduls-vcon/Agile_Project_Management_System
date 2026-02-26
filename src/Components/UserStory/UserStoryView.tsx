@@ -12,12 +12,12 @@ import {
 import { useApp } from "../../Context";
 import type { UserStory } from "../../Models";
 
-interface Props {
+interface UserViewProps {
   story: UserStory;
   projectId: string;
 }
 
-const UserStoryView: React.FC<Props> = ({ story, projectId }) => {
+const UserStoryView: React.FC<UserViewProps> = ({ story, projectId }) => {
   const { users, projects } = useApp();
 
   const assignedUser = users.find((u) => u.id === story.assignedTo);

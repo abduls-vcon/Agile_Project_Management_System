@@ -25,9 +25,10 @@ import BugReportIcon from "@mui/icons-material/BugReport";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { blue} from "@mui/material/colors";
 import { useApp } from "../../Context";
+import type { User } from "../../Models";
 
 interface UserItemsProps {
-  users: any[];
+  users: User[];
 }
 
 const roleIcon = (role: string) => {
@@ -81,7 +82,7 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
 
   return (
     <Box sx={{ my: 1, p: 1 }}>
-      <Grid container spacing={3} justifyContent="center">
+      <Grid container spacing={2} justifyContent="center">
         {users.map((user) => (
           <Grid sx={{ xs: 12, sm: 6, md: 4, lg: 3, mx:1}} key={user.id}>
             <Card

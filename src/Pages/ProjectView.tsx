@@ -45,7 +45,7 @@ const ProjectView: React.FC = () => {
       const userMatch =
         selectedUser === "all" || project.ownerId === selectedUser;
       const dateMatch =
-        !selectedDate || project.createdDate.startsWith(selectedDate); // match YYYY-MM-DD
+        !selectedDate || project.createdDate.startsWith(selectedDate);
       return statusMatch && userMatch && dateMatch;
     });
   }, [projects, status, selectedUser, selectedDate]);
@@ -156,12 +156,12 @@ const ProjectView: React.FC = () => {
             />
           </Box>
 
-          <Box sx={{ mt:20,p: 5, flex:1, display:"flex",justifyContent:"center", alignItems:"center"}}>
+          <Box sx={{ mt:5,p: 5, flex:1, display:"flex",justifyContent:"left", alignItems:"center"}}>
            {loading ? (
               <CircularProgress
-                size={60}
+                size={80}
                 thickness={5}
-                sx={{ color: blue[700], textAlign:'center' }}
+                sx={{ color: blue[700], alignItems:'center',ml:80}}
               />
             ) : (
               <Grid container spacing={4} justifyContent="center" sx={{marginTop:-20}}>

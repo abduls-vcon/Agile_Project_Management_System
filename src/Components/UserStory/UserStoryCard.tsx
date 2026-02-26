@@ -9,13 +9,13 @@ import UserStoryView from "./UserStoryView";
 import { Delete } from "@mui/icons-material";
 
 
-interface Props {
+interface UserStoryProps {
   story: UserStory;
   projectId: string;
   priority?:string
 }
 
-const UserStoryCard: React.FC<Props> = ({ story, projectId}) => {
+const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId}) => {
   const { users, deleteUserStory } = useApp();
   const { onDragStart } = useDragDrop();
   const [open, setOpen] = useState(false);
@@ -38,7 +38,7 @@ const UserStoryCard: React.FC<Props> = ({ story, projectId}) => {
     <>
       <Card
         draggable
-        onDragStart={onDragStart(story.id)}
+        onDragStart={onDragStart(Number(story.id))}
         onClick={() => setOpen(true)}
         sx={{
           bgcolor: grey[50],

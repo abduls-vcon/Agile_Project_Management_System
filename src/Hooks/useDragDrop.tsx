@@ -1,12 +1,12 @@
 import { useState } from "react";
 
 export function useDragDrop() {
-  const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  const [draggedItem, setDraggedItem] = useState<number | null>(null);
 
-  const onDragStart = (id: string) => (e: React.DragEvent) => {
+  const onDragStart = (id: number) => (e: React.DragEvent) => {
     setDraggedItem(id);
     e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", id);
+    e.dataTransfer.setData("text/plain", id.toString());
   };
 
   const onDragOver = (e: React.DragEvent) => {

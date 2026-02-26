@@ -15,12 +15,12 @@ import {
   Button,
 } from "@mui/material";
 
+import type { Role } from "../Models";
+
 interface AddUserProps {
   open: boolean;
   onClose: () => void;
 }
-
-type Role = "Developer" | "Tester" | "Manager";
 
 const AddUser: React.FC<AddUserProps> = ({ open, onClose }) => {
   const [name, setName] = useState("");

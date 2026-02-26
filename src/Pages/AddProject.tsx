@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useApp } from "../Context";
-import type { Project } from "../Models";
+import type { Project, User } from "../Models";
 
 import {
   Dialog,
@@ -32,11 +32,12 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("Active");
-  const [selectedOwnerId, setSelectedOwnerId] = useState<number | "">("");
+  const [selectedOwnerId, setSelectedOwnerId] = useState<number | null>(null);
+  const [selectedTeamMembers, setSelectedTeamMembers] = useState<User[]>([]);
   const [createdDate, setCreatedDate] = useState(todayString);
 
   const handleSave = () => {
-    if (!name.trim() || selectedOwnerId === "") return;
+    if (!name.trim() || selectedOwnerId === null) return;
 
     const newProject: Project = {
       id: Date.now().toString(),
@@ -45,17 +46,16 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
       status,
       userStories: [],
       ownerId: selectedOwnerId,
+      teamMembers: selectedTeamMembers,
       createdDate: new Date(createdDate).toISOString(),
-      updatedDate: new Date().toISOString(),
     };
 
     addProject(newProject);
-
-    // Reset fields
     setName("");
     setDescription("");
     setStatus("Active");
-    setSelectedOwnerId("");
+    setSelectedOwnerId(null);
+    setSelectedTeamMembers([]);
     setCreatedDate(todayString);
 
     onClose();
@@ -97,7 +97,6 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
             </Select>
           </FormControl>
 
-          {/* Native Date Input */}
           <TextField
             label="Created Date"
             type="date"
@@ -117,10 +116,8 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
 
             <Select
               labelId="owner-label"
-              value={selectedOwnerId}
-              onChange={(e) =>
-                setSelectedOwnerId(e.target.value as number)
-              }
+              value={selectedOwnerId ?? ""}
+              onChange={(e) => setSelectedOwnerId(Number(e.target.value))}
             >
               {users.map((u) => (
                 <MenuItem
@@ -141,15 +138,65 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
                         u.role === "Manager"
                           ? "error.main"
                           : u.role === "Developer"
-                          ? "primary.main"
-                          : u.role === "Tester"
-                          ? "warning.main"
-                          : "text.primary",
+                            ? "primary.main"
+                            : u.role === "Tester"
+                              ? "warning.main"
+                              : "text.primary",
                       fontWeight: 600,
                     }}
                   >
                     {u.role}
                   </Typography>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel id="team-members-label">Team Members</InputLabel>
+
+            <Select
+              labelId="team-members-label"
+              multiple
+              value={selectedTeamMembers.map((u) => String(u.id))}
+              label="Team Members"
+              onChange={(e) => {
+                const selectedIds = e.target.value as string[];
+
+                const selectedUsers = users.filter((user) =>
+                  selectedIds.includes(String(user.id)),
+                );
+
+                setSelectedTeamMembers(selectedUsers);
+              }}
+              renderValue={(selected) => {
+                const ids = selected as string[];
+
+                return users
+                  .filter((u) => ids.includes(String(u.id)))
+                  .map((u) => u.name)
+                  .join(", ");
+              }}
+            >
+              {users.map((u) => (
+                <MenuItem key={u.id} value={String(u.id)} sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    color: grey[500],
+                  }}>
+                  <Typography>{u.name}</Typography>
+                  <Typography sx={{
+                      color:
+                        u.role === "Manager"
+                          ? "error.main"
+                          : u.role === "Developer"
+                            ? "primary.main"
+                            : u.role === "Tester"
+                              ? "warning.main"
+                              : "text.primary",
+                      fontWeight: 600,
+                    }}>{u.role}</Typography>
                 </MenuItem>
               ))}
             </Select>

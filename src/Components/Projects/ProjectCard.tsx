@@ -8,8 +8,9 @@ import {
   Chip,
   Stack,
   Divider,
+  Avatar,
+  AvatarGroup,
 } from "@mui/material";
-import { Avatar, AvatarGroup } from "@mui/material";
 import { grey, green, blue, yellow } from "@mui/material/colors";
 import FreeCancellationSharpIcon from "@mui/icons-material/FreeCancellationSharp";
 import { Edit } from "@mui/icons-material";
@@ -88,7 +89,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
 
   const owner = useMemo(
     () => users.find((u) => Number(u.id) === Number(project.ownerId)),
-    [users, project.ownerId],
+    [users, project.ownerId]
   );
 
   const formattedCreated = useDateFormat(project.createdDate);
@@ -102,13 +103,8 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
     navigate(`/board/${project.id}`);
   }, [navigate, project.id]);
 
-  const assignedUserIds = Array.from(
-    new Set(project.userStories.map((story) => story.assignedTo)),
-  );
+  const teamMembers = project.teamMembers ?? [];
 
-  const assignedUsers = users.filter((user) =>
-    assignedUserIds.includes(user.id),
-  );
   return (
     <>
       <Card
@@ -116,7 +112,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
         elevation={8}
         sx={{
           width: 400,
-          height: 400,
+          height: 380,
           borderRadius: 4,
           bgcolor: grey[50],
           border: `1px solid ${grey[200]}`,
@@ -126,12 +122,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
         }}
       >
         <CardContent>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-          >
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6" fontWeight={600} color={blue[700]}>
               {project.name}
             </Typography>
@@ -146,6 +137,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
           </Box>
 
           <Divider sx={{ my: 2 }} />
+
           <Box display="flex" justifyContent="center">
             <Grid container spacing={2} justifyContent="center">
               <Grid sx={{ width: 170 }}>
@@ -162,11 +154,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
                 <InfoBox
                   label="User Stories"
                   value={
-                    <Typography
-                      variant="h5"
-                      fontWeight="bold"
-                      color={blue[700]}
-                    >
+                    <Typography variant="h5" fontWeight="bold" color={blue[700]}>
                       {project.userStories.length}
                     </Typography>
                   }
@@ -190,22 +178,28 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
                 <InfoBox
                   label="Users"
                   value={
-                    <AvatarGroup max={3} sx={{ justifyContent: "flex-start" }}>
-                      {assignedUsers.map((user) => (
-                        <Avatar
-                          key={user.id}
-                          sx={{
-                            bgcolor: user.avatarColor,
-                            width: 40,
-                            height: 40,
-                            fontSize: 14,
-                            border: "2px solid white",
-                          }}
-                        >
-                          {user.name.charAt(0).toUpperCase()}
-                        </Avatar>
-                      ))}
-                    </AvatarGroup>
+                    teamMembers.length > 0 ? (
+                      <AvatarGroup max={3} sx={{ justifyContent: "flex-start" }}>
+                        {teamMembers.map((user) => (
+                          <Avatar
+                            key={user.id}
+                            sx={{
+                              bgcolor: user.avatarColor,
+                              width: 40,
+                              height: 40,
+                              fontSize: 14,
+                              border: "2px solid white",
+                            }}
+                          >
+                            {user.name.charAt(0).toUpperCase()}
+                          </Avatar>
+                        ))}
+                      </AvatarGroup>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        No Team Members
+                      </Typography>
+                    )
                   }
                   bgColor="#fff"
                   borderColor={grey[200]}
@@ -215,11 +209,8 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
           </Box>
 
           <Divider sx={{ my: 2 }} />
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
+
+          <Box display="flex" justifyContent="space-between" alignItems="center">
             <Stack direction="row" spacing={1} alignItems="center">
               <FreeCancellationSharpIcon sx={{ color: green[400] }} />
               <Typography variant="body2" fontWeight={500} color={grey[600]}>

@@ -1,7 +1,7 @@
 export interface User{
     id: string,
     name:string,
-    role: "Developer" | "Tester" | "Manager",
+    role: Role,
     avatarColor?:string
 }
 
@@ -10,8 +10,8 @@ export interface UserStory{
     id:string,
     title:string,
     description:string,
-    status: "Backlog" | "In Progress" | "Testing" | "Completed",
-    priority: "Low" | "Medium" | "High",
+    status: UserStoryStatus,
+    priority: Priority,
     assignedTo: string;
     storyPoints?:number,
 }
@@ -24,6 +24,10 @@ export interface Project{
     status:string,
     userStories:UserStory[],
     ownerId:number,
+    teamMembers:User[],
     createdDate:string,
-    updatedDate:string
 }
+
+export type UserStoryStatus = "Backlog" | "In Progress" | "Testing" | "Completed";
+export type Role = "Developer" | "Tester" | "Manager";
+export type Priority = "Low" | "Medium" | "High";

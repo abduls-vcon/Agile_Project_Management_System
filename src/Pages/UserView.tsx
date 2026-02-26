@@ -25,7 +25,7 @@ const UserView: React.FC = () => {
   const { users } = useApp();
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500); // shorter loading
+    const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -127,7 +127,7 @@ const UserView: React.FC = () => {
             }}
           >
             {loading ? (
-              <CircularProgress size={60} thickness={5} sx={{ color: blue[700] }} />
+              <CircularProgress size={80} thickness={5} sx={{ color: blue[700], mt:30 }} />
             ) : (
               <UserItems users={filteredUsers} />
             )}

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Box,
-  Grid,
   Typography,
   Button,
   FormControl,
@@ -18,7 +17,7 @@ import ErrorComponent from "../Components/Layout/ErrorComponent";
 import { blue, grey } from "@mui/material/colors";
 import AddUserStory from "./AddUserStory";
 
-type UserStoryStatus = "Backlog" | "In Progress" | "Testing" | "Completed";
+import type { UserStoryStatus } from "../Models";
 
 const STATUSES: UserStoryStatus[] = [
   "Backlog",
@@ -119,24 +118,31 @@ const KanbanBoard: React.FC = () => {
               />
             )}
 
-            <Grid p={3} container spacing={2}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                px: 3,
+                py: 2,
+                overflowX: "auto",
+              }}
+            >
               {STATUSES.map((status) => (
-                <Grid sx={{ xs: 12, md: 3 }} key={status}>
-                  <KanbanColumn
-                    projectId={project.id}
-                    status={status}
-                    stories={project.userStories.filter(
-                      (s) =>
-                        s.status === status &&
-                        (selectedPriority === "all"
-                          ? true
-                          : s.priority === selectedPriority),
-                    )}
-                    priority={selectedPriority}
-                  />
-                </Grid>
+                <KanbanColumn
+                  key={status}
+                  projectId={project.id}
+                  status={status}
+                  priority={selectedPriority}
+                  stories={project.userStories.filter(
+                    (s) =>
+                      s.status === status &&
+                      (selectedPriority === "all"
+                        ? true
+                        : s.priority === selectedPriority),
+                  )}
+                />
               ))}
-            </Grid>
+            </Box>
           </Box>
         </Box>
       </Box>

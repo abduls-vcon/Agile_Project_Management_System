@@ -2,12 +2,12 @@ import React from "react";
 import { Avatar as MuiAvatar } from "@mui/material";
 import type { User } from "../../Models";
 
-interface Props {
+interface AvatarProps {
   user: User;
   size?: number;
 }
 
-const Avatar: React.FC<Props> = ({ user, size = 32 }) => {
+const Avatar: React.FC<AvatarProps> = ({ user, size = 32 }) => {
   return (
     <MuiAvatar
       sx={{

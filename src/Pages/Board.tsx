@@ -15,7 +15,8 @@ import KanbanColumn from "../Components/Board/KanbanColumn";
 import AddUserStory from "./AddUserStory";
 import { useApp } from "../Context";
 
-type UserStoryStatus = "Backlog" | "In Progress" | "Testing" | "Completed";
+import type { UserStoryStatus } from "../Models";
+
 const STATUSES: UserStoryStatus[] = [
   "Backlog",
   "In Progress",
@@ -116,7 +117,6 @@ const Board: React.FC = () => {
               </FormControl>
             </Box>
 
-            {/* Add Story Button */}
             <Button
               sx={{
                 bgcolor: blue[100],

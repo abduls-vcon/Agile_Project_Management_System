@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Typography,
   Dialog,
@@ -20,17 +20,24 @@ interface Props {
   projectId: string;
 }
 
-type UserStoryStatus = "Backlog" | "In Progress" | "Testing" | "Completed";
+import type { UserStoryStatus } from "../Models";
 
 const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
-  const { addUserStory, users } = useApp();
+  const { addUserStory, projects } = useApp();
+
+  const project = useMemo(
+    () => projects.find((p) => p.id === projectId),
+    [projects, projectId]
+  );
+
+  const projectTeamMembers = project?.teamMembers ?? [];
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<UserStoryStatus>("Backlog");
   const [priority, setPriority] = useState<"Low" | "Medium" | "High">("Medium");
   const [assignedTo, setAssignedTo] = useState<string>("");
-  const [storyPoints, setStoryPoints] = useState<number>(0); // <-- Added state
+  const [storyPoints, setStoryPoints] = useState<number>(0);
 
   const handleSubmit = () => {
     if (!title.trim() || !description.trim()) return;
@@ -46,6 +53,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
     };
 
     addUserStory(projectId, newStory);
+
     setTitle("");
     setDescription("");
     setStatus("Backlog");
@@ -105,14 +113,22 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
             <MenuItem value="High">High</MenuItem>
           </TextField>
 
+          {/* ✅ Updated Assign To */}
           <TextField
             select
             label="Assign To"
             value={assignedTo}
             onChange={(e) => setAssignedTo(e.target.value)}
+            disabled={projectTeamMembers.length === 0}
+            helperText={
+              projectTeamMembers.length === 0
+                ? "No team members assigned to this project"
+                : ""
+            }
           >
             <MenuItem value="">Unassigned</MenuItem>
-            {users.map((u) => (
+
+            {projectTeamMembers.map((u) => (
               <MenuItem
                 key={u.id}
                 value={u.id}
@@ -130,10 +146,10 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
                       u.role === "Manager"
                         ? "error.main"
                         : u.role === "Developer"
-                          ? "primary.main"
-                          : u.role === "Tester"
-                            ? "warning.main"
-                            : "text.primary",
+                        ? "primary.main"
+                        : u.role === "Tester"
+                        ? "warning.main"
+                        : "text.primary",
                     fontWeight: 600,
                   }}
                 >
@@ -149,7 +165,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
             value={storyPoints}
             onChange={(e) => {
               const value = Number(e.target.value);
-              if (value >= 1 && value <= 13) setStoryPoints(value); // Range 1-13
+              if (value >= 1 && value <= 13) setStoryPoints(value);
             }}
             size="small"
             sx={{ minWidth: 180 }}
