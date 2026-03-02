@@ -11,10 +11,13 @@ import {
 } from "@mui/material";
 import { useApp } from "../../Context";
 import type { UserStory } from "../../Models";
+import PestControlIcon from '@mui/icons-material/PestControl';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 interface UserViewProps {
   story: UserStory;
   projectId: string;
+  onClose: () => void;
 }
 
 const UserStoryView: React.FC<UserViewProps> = ({ story, projectId }) => {
@@ -69,6 +72,18 @@ const UserStoryView: React.FC<UserViewProps> = ({ story, projectId }) => {
       />
 
       <CardContent sx={{ p: 4 }}>
+        {/* Bug / Story Indicator */}
+        <Box display="flex" alignItems="center" mb={1} gap={1}>
+          {story.isBug ? (
+            <PestControlIcon color="error" fontSize="small" />
+          ) : (
+            <DescriptionIcon color="primary" fontSize="small" />
+          )}
+          <Typography variant="caption" color="text.secondary" fontWeight={800}>
+            {story.isBug ? "Bug" : "Story"}
+          </Typography>
+        </Box>
+
         <Typography variant="h5" fontWeight={700} gutterBottom color="grey.800">
           {story.title}
         </Typography>

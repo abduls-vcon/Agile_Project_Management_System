@@ -4,6 +4,7 @@ import ProjectView from "../src/Pages/ProjectView"
 import UserView from "../src/Pages/UserView"
 import KanbanBoard from "../src/Pages/KanbanBoard"
 import Board from "../src/Pages/Board"
+import ErrorComponent from "./Components/Layout/ErrorComponent"
 
 
 const App : React.FC = () => {
@@ -16,6 +17,7 @@ const App : React.FC = () => {
           <Route path="/users" element={<UserView/>}/>
           <Route path="/board/:id" element={<KanbanBoard/>}/>
           <Route path="/boards" element={<Board/>}/>
+          <Route path="*" element={<ErrorComponent title="Page Not Found"/>}/>
         </Routes>
       </BrowserRouter>
     </div>

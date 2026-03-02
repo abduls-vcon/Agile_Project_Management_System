@@ -17,7 +17,6 @@ const Navbar: React.FC = () => {
       elevation={6}
       sx={{
         backgroundColor: "#f3f4f6",
-        borderBottom: "1px solid #e5e7eb",
       }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: 3 }}>

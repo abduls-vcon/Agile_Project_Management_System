@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import {
   Box,
-  Typography,
   Button,
   TextField,
   MenuItem,
@@ -16,6 +15,7 @@ import AddUserStory from "./AddUserStory";
 import { useApp } from "../Context";
 
 import type { UserStoryStatus } from "../Models";
+import ErrorComponent from "../Components/Layout/ErrorComponent";
 
 const STATUSES: UserStoryStatus[] = [
   "Backlog",
@@ -39,16 +39,7 @@ const Board: React.FC = () => {
 
   if (!project) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "80vh",
-        }}
-      >
-        <Typography>No project selected</Typography>
-      </Box>
+      <ErrorComponent title="Something went wrong !"/>
     );
   }
 

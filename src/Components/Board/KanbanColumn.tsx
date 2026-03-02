@@ -5,6 +5,7 @@ import { useApp } from "../../Context";
 import type { UserStory } from "../../Models";
 import { useDragDrop } from "../../Hooks/useDragDrop";
 import type { UserStoryStatus } from "../../Models";
+import { green, grey, orange, yellow } from "@mui/material/colors";
 
 interface KanbanProps {
   projectId: string;
@@ -28,18 +29,25 @@ const KanbanColumn: React.FC<KanbanProps> = ({ projectId, status, stories }) => 
       elevation={3}
       sx={{
         p: 2,
-        width: 280,
-        minWidth: 280,
-        backgroundColor: "rgba(255,255,255,0.9)",
+        width: 270,
         backdropFilter: "blur(4px)",
         display: "flex",
         flexDirection: "column",
-        maxHeight: "80vh",
         overflowY: "auto",
-        height: "auto", 
+        height: "auto",
+        bgcolor:
+        status === "Backlog"
+          ? grey[100]
+          : status === "In Progress"
+          ? yellow[100]
+          : status === "Testing"
+          ? orange[100]
+          : status === "Completed"
+          ? green[100]
+          : "white",
       }}
     >
-      <Typography variant="h6" gutterBottom>
+      <Typography sx={{ fontWeight:"bold", color: grey[700], mb: 2 }}variant="h6" gutterBottom>
         {status}
       </Typography>
 

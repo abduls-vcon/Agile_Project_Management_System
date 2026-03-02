@@ -10,6 +10,7 @@ export interface UserStory{
     id:string,
     title:string,
     description:string,
+    isBug:boolean,
     status: UserStoryStatus,
     priority: Priority,
     assignedTo: string;

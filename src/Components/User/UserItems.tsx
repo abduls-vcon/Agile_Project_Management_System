@@ -23,7 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CodeIcon from "@mui/icons-material/Code";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import { blue} from "@mui/material/colors";
+import { blue, grey} from "@mui/material/colors";
 import { useApp } from "../../Context";
 import type { User } from "../../Models";
 
@@ -93,8 +93,8 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
                 borderRadius: 3,
                 boxShadow: 6,
                 borderLeft: `4px solid ${blue[700]}`,
-                height: 80,
-                width: 600,
+                height: 60,
+                width: 500,
                 transition: "transform 0.3s, box-shadow 0.3s",
                 "&:hover": { transform: "translateY(-3px)", boxShadow: 12 },
               }}
@@ -126,9 +126,9 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
                     sx={{
                       bgcolor: user.avatarColor,
                       fontWeight: "bold",
-                      width: 56,
-                      height: 56,
-                      fontSize: "1.5rem",
+                      width: 40,
+                      height: 40,
+                      fontSize: "1rem",
                     }}
                   >
                     {user.name.charAt(0).toUpperCase()}
@@ -138,12 +138,12 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
                 <ListItemText
                   sx={{ ml: 2 }}
                   primary={
-                    <Typography sx={{ fontSize: 18 }} fontWeight="medium">
+                    <Typography sx={{ fontSize: 17, fontWeight: "bold"}}>
                       {user.name}
                     </Typography>
                   }
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{color:grey[500]}}>
                       {user.role}
                     </Typography>
                   }

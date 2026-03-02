@@ -11,6 +11,7 @@ import { blue, green, yellow, grey, red, purple } from "@mui/material/colors";
 
 import { useApp } from "../Context";
 import InfoCard from "../Components/Layout/InfoCard";
+import ErrorComponent from "../Components/Layout/ErrorComponent";
 
 const Dashboard: React.FC = () => {
   const { users, projects } = useApp();
@@ -26,6 +27,10 @@ const Dashboard: React.FC = () => {
     { title: "Testers", total: totalTesters, icon: <BugReport fontSize="large" />, color: yellow[700] },
     { title: "Managers", total: totalManager, icon: <ManageAccounts fontSize="large" />, color: purple[500] },
   ];
+
+  if (!projects || !users) {
+    return <ErrorComponent title="Something went wrong" />;
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", bgcolor: grey[50] }}>

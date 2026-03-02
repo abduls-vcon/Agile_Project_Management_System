@@ -9,6 +9,9 @@ import {
   Button,
   MenuItem,
   Box,
+  Avatar,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { useApp } from "../Context";
 import type { UserStory } from "../Models";
@@ -38,6 +41,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
   const [priority, setPriority] = useState<"Low" | "Medium" | "High">("Medium");
   const [assignedTo, setAssignedTo] = useState<string>("");
   const [storyPoints, setStoryPoints] = useState<number>(0);
+    const [checked, setChecked] = useState(false);
 
   const handleSubmit = () => {
     if (!title.trim() || !description.trim()) return;
@@ -50,6 +54,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
       priority,
       assignedTo,
       storyPoints,
+      isBug:checked,
     };
 
     addUserStory(projectId, newStory);
@@ -57,6 +62,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
     setTitle("");
     setDescription("");
     setStatus("Backlog");
+    setChecked(false);  
     setPriority("Medium");
     setAssignedTo("");
     setStoryPoints(0);
@@ -88,6 +94,11 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
             onChange={(e) => setDescription(e.target.value)}
           />
 
+          <FormControlLabel
+            control={<Checkbox checked={checked} onChange={(e) => setChecked(e.target.checked)} />}
+            label="Is Bug"
+          />
+
           <TextField
             select
             label="Status"
@@ -113,7 +124,6 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
             <MenuItem value="High">High</MenuItem>
           </TextField>
 
-          {/* ✅ Updated Assign To */}
           <TextField
             select
             label="Assign To"
@@ -139,7 +149,15 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
                   color: grey[500],
                 }}
               >
+                <Box sx={{display:"flex", alignItems:"center", gap:2}}>
+                  <Avatar
+                          sx={{ width: 30, height: 30, fontSize:15, fontWeight:'bold', bgcolor:u.avatarColor }}
+                          alt={u.name}
+                        >
+                          {u.name[0]}
+                        </Avatar>
                 <Typography>{u.name}</Typography>
+                </Box>
                 <Typography
                   sx={{
                     color:

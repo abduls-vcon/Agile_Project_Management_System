@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useApp } from "../Context";
 import type { Project, User } from "../Models";
-
 import {
   Dialog,
   DialogTitle,
@@ -16,7 +15,6 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-
 import { grey } from "@mui/material/colors";
 
 interface AddProjectProps {
@@ -26,7 +24,6 @@ interface AddProjectProps {
 
 const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
   const { addProject, users } = useApp();
-
   const todayString = new Date().toISOString().split("T")[0];
 
   const [name, setName] = useState("");
@@ -35,6 +32,7 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
   const [selectedOwnerId, setSelectedOwnerId] = useState<number | null>(null);
   const [selectedTeamMembers, setSelectedTeamMembers] = useState<User[]>([]);
   const [createdDate, setCreatedDate] = useState(todayString);
+
 
   const handleSave = () => {
     if (!name.trim() || selectedOwnerId === null) return;
@@ -57,14 +55,12 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
     setSelectedOwnerId(null);
     setSelectedTeamMembers([]);
     setCreatedDate(todayString);
-
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add New Project</DialogTitle>
-
       <DialogContent>
         <Stack spacing={3} mt={1}>
           <TextField
@@ -73,7 +69,6 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-
           <TextField
             label="Project Description"
             fullWidth
@@ -82,7 +77,7 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-
+          
           <FormControl fullWidth>
             <InputLabel id="project-status-label">Status</InputLabel>
             <Select
@@ -96,7 +91,6 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
               <MenuItem value="On Hold">On Hold</MenuItem>
             </Select>
           </FormControl>
-
           <TextField
             label="Created Date"
             type="date"
@@ -105,7 +99,6 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
             fullWidth
             InputLabelProps={{ shrink: true }}
           />
-
           <FormControl fullWidth>
             <InputLabel
               id="owner-label"
@@ -113,7 +106,6 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
             >
               Owner
             </InputLabel>
-
             <Select
               labelId="owner-label"
               value={selectedOwnerId ?? ""}
@@ -131,7 +123,6 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
                   }}
                 >
                   <Typography>{u.name}</Typography>
-
                   <Typography
                     sx={{
                       color:
@@ -151,10 +142,8 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
               ))}
             </Select>
           </FormControl>
-
           <FormControl fullWidth>
             <InputLabel id="team-members-label">Team Members</InputLabel>
-
             <Select
               labelId="team-members-label"
               multiple
@@ -162,16 +151,13 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
               label="Team Members"
               onChange={(e) => {
                 const selectedIds = e.target.value as string[];
-
                 const selectedUsers = users.filter((user) =>
-                  selectedIds.includes(String(user.id)),
+                  selectedIds.includes(String(user.id))
                 );
-
                 setSelectedTeamMembers(selectedUsers);
               }}
               renderValue={(selected) => {
                 const ids = selected as string[];
-
                 return users
                   .filter((u) => ids.includes(String(u.id)))
                   .map((u) => u.name)
@@ -179,14 +165,19 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
               }}
             >
               {users.map((u) => (
-                <MenuItem key={u.id} value={String(u.id)} sx={{
+                <MenuItem
+                  key={u.id}
+                  value={String(u.id)}
+                  sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     color: grey[500],
-                  }}>
+                  }}
+                >
                   <Typography>{u.name}</Typography>
-                  <Typography sx={{
+                  <Typography
+                    sx={{
                       color:
                         u.role === "Manager"
                           ? "error.main"
@@ -196,19 +187,20 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
                               ? "warning.main"
                               : "text.primary",
                       fontWeight: 600,
-                    }}>{u.role}</Typography>
+                    }}
+                  >
+                    {u.role}
+                  </Typography>
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Stack>
       </DialogContent>
-
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} variant="outlined" color="secondary">
           Cancel
         </Button>
-
         <Button onClick={handleSave} variant="contained" color="primary">
           Save
         </Button>

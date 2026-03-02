@@ -7,7 +7,7 @@ interface AvatarProps {
   size?: number;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ user, size = 32 }) => {
+const Avatar: React.FC<AvatarProps> = ({ user, size }) => {
   return (
     <MuiAvatar
       sx={{

@@ -22,8 +22,8 @@ const InfoCard: React.FC<InfoCardProps> = ({ color, icon, total, title }) => {
           borderRadius: 3,
           bgcolor: color,
           color: "#fff",
-          height: 140,
-          width: 140,
+          height: 100,
+          width: 100,
           transition: "transform 0.3s, box-shadow 0.3s",
           "&:hover": { transform: "translateY(-5px)", boxShadow: 8 },
         }}

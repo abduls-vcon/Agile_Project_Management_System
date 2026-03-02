@@ -42,16 +42,16 @@ const InfoBox: React.FC<InfoBoxProps> = ({
 }) => (
   <Box
     sx={{
-      p: 2,
-      borderRadius: 3,
+      p: 1.2,
+      borderRadius: 2,
       bgcolor: bgColor,
       border: `1px solid ${borderColor}`,
       display: "flex",
       flexDirection: "column",
-      gap: 1,
-      width: 140,
+      gap: 0.5,
       transition: "transform 0.3s",
-      "&:hover": { transform: "translateY(-3px)" },
+      "&:hover": { transform: "translateY(-2px)" },
+      width: 95,
     }}
   >
     <Typography
@@ -60,24 +60,27 @@ const InfoBox: React.FC<InfoBoxProps> = ({
         textTransform: "uppercase",
         color: "text.secondary",
         fontWeight: 600,
+        fontSize: 10,
       }}
     >
       {label}
     </Typography>
+
     {typeof value === "string" || typeof value === "number" ? (
       <Chip
         label={value}
+        size="small"
         sx={{
-          mt: 1,
+          mt: 0.5,
           bgcolor: grey[50],
           color: color,
           fontWeight: "bold",
           border: `1px solid ${borderColor}`,
-          fontSize: 15,
+          fontSize: 12,
         }}
       />
     ) : (
-      <Box mt={1}>{value}</Box>
+      <Box mt={0.5}>{value}</Box>
     )}
   </Box>
 );
@@ -89,7 +92,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
 
   const owner = useMemo(
     () => users.find((u) => Number(u.id) === Number(project.ownerId)),
-    [users, project.ownerId]
+    [users, project.ownerId],
   );
 
   const formattedCreated = useDateFormat(project.createdDate);
@@ -109,115 +112,133 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
     <>
       <Card
         onDoubleClick={handleCardDoubleClick}
-        elevation={8}
+        elevation={6}
         sx={{
-          width: 400,
-          height: 380,
-          borderRadius: 4,
+          width: 280,
+          minHeight: 260,
+          borderRadius: 3,
           bgcolor: grey[50],
           border: `1px solid ${grey[200]}`,
           cursor: "pointer",
           transition: "transform 0.3s, box-shadow 0.3s",
-          "&:hover": { transform: "translateY(-5px)", boxShadow: 10 },
+          "&:hover": { transform: "translateY(-4px)", boxShadow: 8 },
         }}
       >
-        <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6" fontWeight={600} color={blue[700]}>
+        <CardContent sx={{ p: 2 }}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={1}
+          >
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              color={blue[700]}
+              noWrap
+            >
               {project.name}
             </Typography>
+
             <Edit
               sx={{
                 cursor: "pointer",
                 color: blue[600],
+                fontSize: 20,
                 "&:hover": { color: blue[800] },
               }}
               onClick={handleEditClick}
             />
           </Box>
 
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 1 }} />
 
-          <Box display="flex" justifyContent="center">
-            <Grid container spacing={2} justifyContent="center">
-              <Grid sx={{ width: 170 }}>
-                <InfoBox
-                  label="Status"
-                  value={project.status}
-                  bgColor={green[50]}
-                  borderColor={green[200]}
-                  color={green[700]}
-                />
-              </Grid>
-
-              <Grid sx={{ width: 170 }}>
-                <InfoBox
-                  label="User Stories"
-                  value={
-                    <Typography variant="h5" fontWeight="bold" color={blue[700]}>
-                      {project.userStories.length}
-                    </Typography>
-                  }
-                  bgColor={blue[50]}
-                  borderColor={blue[200]}
-                  color={blue[700]}
-                />
-              </Grid>
-
-              <Grid sx={{ width: 170 }}>
-                <InfoBox
-                  label="Admin"
-                  value={owner?.name ?? "—"}
-                  bgColor={yellow[50]}
-                  borderColor={yellow[200]}
-                  color={yellow[800]}
-                />
-              </Grid>
-
-              <Grid sx={{ width: 170 }}>
-                <InfoBox
-                  label="Users"
-                  value={
-                    teamMembers.length > 0 ? (
-                      <AvatarGroup max={3} sx={{ justifyContent: "flex-start" }}>
-                        {teamMembers.map((user) => (
-                          <Avatar
-                            key={user.id}
-                            sx={{
-                              bgcolor: user.avatarColor,
-                              width: 40,
-                              height: 40,
-                              fontSize: 14,
-                              border: "2px solid white",
-                            }}
-                          >
-                            {user.name.charAt(0).toUpperCase()}
-                          </Avatar>
-                        ))}
-                      </AvatarGroup>
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        No Team Members
-                      </Typography>
-                    )
-                  }
-                  bgColor="#fff"
-                  borderColor={grey[200]}
-                />
-              </Grid>
+          <Grid container spacing={1}>
+            <Grid sx={{ xs: 6 }}>
+              <InfoBox
+                label="Status"
+                value={project.status}
+                bgColor={green[50]}
+                borderColor={green[200]}
+                color={green[700]}
+              />
             </Grid>
-          </Box>
 
-          <Divider sx={{ my: 2 }} />
+            <Grid sx={{ xs: 6 }}>
+              <InfoBox
+                label="Stories"
+                value={
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="bold"
+                    color={blue[700]}
+                  >
+                    {project.userStories.length}
+                  </Typography>
+                }
+                bgColor={blue[50]}
+                borderColor={blue[200]}
+              />
+            </Grid>
 
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Stack direction="row" spacing={1} alignItems="center">
-              <FreeCancellationSharpIcon sx={{ color: green[400] }} />
-              <Typography variant="body2" fontWeight={500} color={grey[600]}>
-                {formattedCreated}
-              </Typography>
-            </Stack>
-          </Box>
+            <Grid sx={{ xs: 6 }}>
+              <InfoBox
+                label="Admin"
+                value={owner?.name ?? "—"}
+                bgColor={yellow[50]}
+                borderColor={yellow[200]}
+                color={yellow[800]}
+              />
+            </Grid>
+
+            <Grid sx={{ xs: 6 }}>
+              <InfoBox
+                label="Users"
+                value={
+                  teamMembers.length > 0 ? (
+                    <AvatarGroup
+                      max={3}
+                      sx={{
+                        "& .MuiAvatar-root": {
+                          width: 24,
+                          height: 24,
+                          fontSize: 12,
+                          border: "2px solid white",
+                        },
+                      }}
+                    >
+                      {teamMembers.map((user) => (
+                        <Avatar
+                          key={user.id}
+                          sx={{
+                            bgcolor: user.avatarColor,
+                          }}
+                        >
+                          {user.name.charAt(0).toUpperCase()}
+                        </Avatar>
+                      ))}
+                    </AvatarGroup>
+                  ) : (
+                    <Typography variant="caption" color="text.secondary">
+                      No Members
+                    </Typography>
+                  )
+                }
+                bgColor="#fff"
+                borderColor={grey[200]}
+              />
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 1.5 }} />
+          <Stack direction="row" spacing={1} alignItems="center">
+            <FreeCancellationSharpIcon
+              sx={{ color: green[400], fontSize: 18 }}
+            />
+            <Typography variant="caption" fontWeight={500} color={grey[600]}>
+              {formattedCreated}
+            </Typography>
+          </Stack>
         </CardContent>
       </Card>
 

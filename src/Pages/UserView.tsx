@@ -14,6 +14,7 @@ import InfoBar from "../Components/Layout/InfoBar";
 import { blue, grey } from "@mui/material/colors";
 import AddUser from "./AddUser";
 import UserItems from "../Components/User/UserItems";
+import ErrorComponent from "../Components/Layout/ErrorComponent";
 import { useApp } from "../Context";
 
 const UserView: React.FC = () => {
@@ -28,6 +29,10 @@ const UserView: React.FC = () => {
     const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
+
+  if (!users) {
+  return <ErrorComponent title="Something went wrong" />;
+}
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
