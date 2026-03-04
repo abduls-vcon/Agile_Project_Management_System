@@ -7,8 +7,8 @@ import * as userStoriesFuncs from "./userStories";
 const AppContext = createContext<AppContextType | null>(null);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { users, addUser, updateUser, deleteUser } = useUsers();
-  const { projects, addProject, updateProject, deleteProject, setProjects } = useProjects();
+ const { projects, addProject, updateProject, deleteProject, setProjects } = useProjects();
+  const { users, addUser, updateUser, deleteUser } = useUsers(setProjects);
 
   const value = useMemo<AppContextType>(() => ({
     users,

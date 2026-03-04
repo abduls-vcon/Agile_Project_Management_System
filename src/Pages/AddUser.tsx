@@ -31,7 +31,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose }) => {
     if (!name.trim()) return;
 
     const newUser: Omit<User, "avatarColor"> = {
-      id: Date.now().toString(),
+      id: Date.now(),
       name,
       role,
     };

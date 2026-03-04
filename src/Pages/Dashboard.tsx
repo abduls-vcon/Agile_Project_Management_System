@@ -39,9 +39,15 @@ const Dashboard: React.FC = () => {
         <Sidebar />
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflowY: "auto", p: 3 }}>
           <InfoBar />
-          <Grid container spacing={9} sx={{display:'flex',justifyContent:'center',pt:3}}>
+          <Grid container spacing={9} sx={{ display: "flex", justifyContent: "center", pt: 3 }}>
             {dashboardCards.map((card) => (
-              <InfoCard title={card.title} total={card.total} icon={card.icon} color={card.color}/>
+              <InfoCard
+                key={card.title}
+                title={card.title}
+                total={card.total}
+                icon={card.icon}
+                color={card.color}
+              />
             ))}
           </Grid>
           <Box sx={{ mt: 4 }}>
@@ -61,7 +67,7 @@ const Dashboard: React.FC = () => {
               }}
             >
               <Typography variant="h3" sx={{ color: grey[300], mb: 1 }}>
-                <Info sx={{fontSize:50}}/>
+                <Info sx={{ fontSize: 50 }} />
               </Typography>
               <Typography variant="h6" fontWeight={500} color={grey[400]}>
                 No Updates

@@ -50,7 +50,7 @@ const ProjectView: React.FC = () => {
       const userMatch =
         selectedUser === "all" || project.ownerId === selectedUser;
       const dateMatch =
-        !selectedDate || project.createdDate.startsWith(selectedDate);
+        !selectedDate || project.createdDate?.startsWith(selectedDate);
       return statusMatch && userMatch && dateMatch;
     });
   }, [projects, status, selectedUser, selectedDate]);
@@ -108,7 +108,6 @@ const ProjectView: React.FC = () => {
             </Select>
           </FormControl>
 
-          {/* Owner Filter */}
           <TextField
             select
             label="Filter by Owner"
@@ -149,7 +148,7 @@ const ProjectView: React.FC = () => {
             height: 45,
             fontWeight: "bold",
             "&:hover": { bgcolor: blue[200] },
-            mt: { xs: 1, sm: 0 }, // stack on small screens
+            mt: { xs: 1, sm: 0 },
           }}
           onClick={() => setOpenDialog(true)}
         >
@@ -159,12 +158,11 @@ const ProjectView: React.FC = () => {
         <AddProject open={openDialog} onClose={() => setOpenDialog(false)} />
       </Box>
 
-      {/* Project Grid */}
       <Box sx={{ flex: 1, p: { xs: 2, sm: 5 }, display: "flex", justifyContent: "center" }}>
         {loading ? (
           <CircularProgress size={80} thickness={5} sx={{ color: blue[700] }} />
         ) : (
-          <Grid container spacing={4} justifyContent="center" sx={{ width: "100%", maxWidth: "1400px" }}>
+          <Grid container spacing={4} justifyContent="left" sx={{ width: "100%", maxWidth: "1400px" }}>
             {filteredProjects.map((project) => (
               <Grid key={project.id} sx={{ xs:12, sm:6, md:4, lg:3}}>
                 <ProjectCard project={project} />

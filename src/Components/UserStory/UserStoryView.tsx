@@ -16,7 +16,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 
 interface UserViewProps {
   story: UserStory;
-  projectId: string;
+  projectId: number;
   onClose: () => void;
 }
 
@@ -72,7 +72,6 @@ const UserStoryView: React.FC<UserViewProps> = ({ story, projectId }) => {
       />
 
       <CardContent sx={{ p: 4 }}>
-        {/* Bug / Story Indicator */}
         <Box display="flex" alignItems="center" mb={1} gap={1}>
           {story.isBug ? (
             <PestControlIcon color="error" fontSize="small" />

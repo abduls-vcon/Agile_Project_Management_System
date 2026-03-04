@@ -8,18 +8,25 @@ import type { UserStoryStatus } from "../../Models";
 import { green, grey, orange, yellow } from "@mui/material/colors";
 
 interface KanbanProps {
-  projectId: string;
+  projectId: number;
   status: UserStoryStatus;
   stories: UserStory[];
-  priority?:string
+  priority:string
 }
+
+const statusColors: Record<UserStoryStatus | string, string> = {
+  "Backlog": grey[100],
+  "In Progress": yellow[100],
+  "Testing": orange[100],
+  "Completed": green[100],
+};
 
 const KanbanColumn: React.FC<KanbanProps> = ({ projectId, status, stories }) => {
   const { updateUserStoryStatus } = useApp();
   const { onDragOver, onDrop } = useDragDrop();
 
   const handleDrop = (storyId: string) => {
-    updateUserStoryStatus(projectId, storyId, status);
+    updateUserStoryStatus(projectId, Number(storyId), status);
   };
 
   return (
@@ -35,16 +42,7 @@ const KanbanColumn: React.FC<KanbanProps> = ({ projectId, status, stories }) => 
         flexDirection: "column",
         overflowY: "auto",
         height: "auto",
-        bgcolor:
-        status === "Backlog"
-          ? grey[100]
-          : status === "In Progress"
-          ? yellow[100]
-          : status === "Testing"
-          ? orange[100]
-          : status === "Completed"
-          ? green[100]
-          : "white",
+        bgcolor: statusColors[status] || "white",
       }}
     >
       <Typography sx={{ fontWeight:"bold", color: grey[700], mb: 2 }}variant="h6" gutterBottom>

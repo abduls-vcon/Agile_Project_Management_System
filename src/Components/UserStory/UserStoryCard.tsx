@@ -29,8 +29,10 @@ import UserStoryView from "./UserStoryView";
 
 interface UserStoryProps {
   story: UserStory;
-  projectId: string;
+  projectId: number;
 }
+
+const STORY_POINT_OPTIONS = [1, 2, 3, 5, 8, 13, 21];
 
 const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
   const { users, projects, deleteUserStory, updateUserStory } = useApp();
@@ -48,13 +50,17 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
   const [priority, setPriority] = useState<"Low" | "Medium" | "High">(
     story.priority,
   );
-  const [assignedTo, setAssignedTo] = useState<string>(story.assignedTo || "");
+  const [assignedTo, setAssignedTo] = useState<number | undefined>(story.assignedTo || undefined);
+  const [storyPoints, setStoryPoints] = useState<number | undefined>(
+    story.storyPoints,
+  );
 
   useEffect(() => {
     setTitle(story.title);
     setDescription(story.description);
     setPriority(story.priority as "Low" | "Medium" | "High");
-    setAssignedTo(story.assignedTo || "");
+    setAssignedTo(story.assignedTo);
+    setStoryPoints(story.storyPoints);
   }, [story]);
 
   const getPriorityColor = (
@@ -84,7 +90,8 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
       title,
       description,
       priority,
-      assignedTo: assignedTo || "",
+      assignedTo: assignedTo || undefined,
+      storyPoints: storyPoints,
     });
     setEditOpen(false);
   };
@@ -173,13 +180,30 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
 
           <Divider sx={{ my: 1 }} />
 
-          <Stack direction="row" justifyContent="space-between">
-            <Chip
-              label={story.priority}
-              size="small"
-              sx={{ fontSize: 10, fontWeight: "bold" }}
-              color={getPriorityColor(story.priority)}
-            />
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip
+                label={story.priority}
+                size="small"
+                sx={{ fontSize: 10, fontWeight: "bold" }}
+                color={getPriorityColor(story.priority)}
+              />
+              {story.storyPoints !== undefined && (
+                <Tooltip title="Story Points">
+                  <Chip
+                    label={`${story.storyPoints} pts`}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      fontSize: 10,
+                      fontWeight: "bold",
+                      borderColor: "primary.main",
+                      color: "primary.main",
+                    }}
+                  />
+                </Tooltip>
+              )}
+            </Stack>
 
             {assignedUser ? (
               <Avatar user={assignedUser} size={28} />
@@ -244,9 +268,30 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
 
             <TextField
               select
+              label="Story Points"
+              value={storyPoints ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                setStoryPoints(val === "" ? undefined : Number(val));
+              }}
+              fullWidth
+              helperText="Fibonacci-based effort estimate"
+            >
+              <MenuItem value="">None</MenuItem>
+              {STORY_POINT_OPTIONS.map((pts) => (
+                <MenuItem key={pts} value={pts}>
+                  {pts}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
               label="Assign To"
-              value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
+              value={assignedTo ?? ""}
+              onChange={(e) =>
+                setAssignedTo(e.target.value ? Number(e.target.value) : undefined)
+              }
               fullWidth
             >
               <MenuItem value="">Unassigned</MenuItem>

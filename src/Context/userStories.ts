@@ -1,6 +1,6 @@
 import type { UserStory, Project, UserStoryStatus } from "../Models";
 
-export const addUserStory = (projects: Project[], setProjects: Function, projectId: string, story: UserStory) => {
+export const addUserStory = (projects: Project[], setProjects: Function, projectId: number, story: UserStory) => {
   setProjects(
     projects.map((p) =>
       p.id === projectId ? { ...p, userStories: [...p.userStories, story] } : p
@@ -8,7 +8,7 @@ export const addUserStory = (projects: Project[], setProjects: Function, project
   );
 };
 
-export const updateUserStory = (projects: Project[], setProjects: Function, projectId: string, updatedStory: UserStory) => {
+export const updateUserStory = (projects: Project[], setProjects: Function, projectId: number, updatedStory: UserStory) => {
   setProjects(
     projects.map((p) =>
       p.id === projectId
@@ -23,7 +23,7 @@ export const updateUserStory = (projects: Project[], setProjects: Function, proj
   );
 };
 
-export const deleteUserStory = (projects: Project[], setProjects: Function, projectId: string, storyId: string) => {
+export const deleteUserStory = (projects: Project[], setProjects: Function, projectId: number, storyId: number) => {
   setProjects(
     projects.map((p) =>
       p.id === projectId
@@ -33,7 +33,7 @@ export const deleteUserStory = (projects: Project[], setProjects: Function, proj
   );
 };
 
-export const updateUserStoryStatus = (projects: Project[], setProjects: Function, projectId: string, storyId: string, newStatus: UserStoryStatus) => {
+export const updateUserStoryStatus = (projects: Project[], setProjects: Function, projectId: number, storyId: number, newStatus: UserStoryStatus) => {
   setProjects(
     projects.map((p) =>
       p.id === projectId

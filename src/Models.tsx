@@ -1,5 +1,5 @@
 export interface User{
-    id: string,
+    id: number,
     name:string,
     role: Role,
     avatarColor?:string
@@ -7,26 +7,27 @@ export interface User{
 
 
 export interface UserStory{
-    id:string,
+    id:number,
     title:string,
     description:string,
     isBug:boolean,
     status: UserStoryStatus,
     priority: Priority,
-    assignedTo: string;
+    assignedTo: number | undefined,
+    createdDate?:string;
     storyPoints?:number,
 }
 
 
 export interface Project{
-    id:string,
+    id:number,
     name:string,
     description:string,
     status:string,
     userStories:UserStory[],
     ownerId:number,
     teamMembers:User[],
-    createdDate:string,
+    createdDate?:string,
 }
 
 export type UserStoryStatus = "Backlog" | "In Progress" | "Testing" | "Completed";

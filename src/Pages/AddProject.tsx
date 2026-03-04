@@ -38,7 +38,7 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
     if (!name.trim() || selectedOwnerId === null) return;
 
     const newProject: Project = {
-      id: Date.now().toString(),
+      id: Date.now(),
       name,
       description,
       status,

@@ -26,8 +26,8 @@ const STATUSES: UserStoryStatus[] = [
 
 const Board: React.FC = () => {
   const { projects } = useApp();
-  const [selectedProjectId, setSelectedProjectId] = useState<string>(
-    projects.length > 0 ? projects[0].id : ""
+  const [selectedProjectId, setSelectedProjectId] = useState<number>(
+    projects.length > 0 ? projects[0].id
   );
   const [selectedPriority, setSelectedPriority] = useState<"all" | string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -80,7 +80,7 @@ const Board: React.FC = () => {
                 <TextField
                   select
                   value={selectedProjectId}
-                  onChange={(e) => setSelectedProjectId(e.target.value)}
+                  onChange={(e) => setSelectedProjectId(e.target.value ? Number(e.target.value) : 0)}
                   label="Project"
                 >
                   {projects.map((p) => (

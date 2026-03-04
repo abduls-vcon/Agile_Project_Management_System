@@ -20,7 +20,7 @@ import { grey } from "@mui/material/colors";
 interface Props {
   open: boolean;
   onClose: () => void;
-  projectId: string;
+  projectId: number;
 }
 
 import type { UserStoryStatus } from "../Models";
@@ -39,7 +39,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<UserStoryStatus>("Backlog");
   const [priority, setPriority] = useState<"Low" | "Medium" | "High">("Medium");
-  const [assignedTo, setAssignedTo] = useState<string>("");
+  const [assignedTo, setAssignedTo] = useState<number | undefined>(undefined);
   const [storyPoints, setStoryPoints] = useState<number>(0);
     const [checked, setChecked] = useState(false);
 
@@ -47,7 +47,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
     if (!title.trim() || !description.trim()) return;
 
     const newStory: UserStory = {
-      id: Date.now().toString(),
+      id: Date.now(),
       title,
       description,
       status,
@@ -64,7 +64,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
     setStatus("Backlog");
     setChecked(false);  
     setPriority("Medium");
-    setAssignedTo("");
+    setAssignedTo(undefined);
     setStoryPoints(0);
 
     onClose();
@@ -128,7 +128,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
             select
             label="Assign To"
             value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
+            onChange={(e) => setAssignedTo(e.target.value ? Number(e.target.value) : undefined)}
             disabled={projectTeamMembers.length === 0}
             helperText={
               projectTeamMembers.length === 0
