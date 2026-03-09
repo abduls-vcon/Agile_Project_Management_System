@@ -33,13 +33,7 @@ interface InfoBoxProps {
   color?: string;
 }
 
-const InfoBox: React.FC<InfoBoxProps> = ({
-  label,
-  value,
-  bgColor,
-  borderColor,
-  color,
-}) => (
+const InfoBox: React.FC<InfoBoxProps> = ({ label, value, bgColor, borderColor, color }) => (
   <Box
     sx={{
       p: 1.2,
@@ -49,8 +43,8 @@ const InfoBox: React.FC<InfoBoxProps> = ({
       display: "flex",
       flexDirection: "column",
       gap: 0.5,
-      transition: "transform 0.3s",
-      "&:hover": { transform: "translateY(-2px)" },
+      transition: "transform 0.3s, box-shadow 0.2s",
+      "&:hover": { transform: "translateY(-2px)", boxShadow: `0 4px 10px ${borderColor}99` },
       width: 95,
     }}
   >
@@ -58,9 +52,10 @@ const InfoBox: React.FC<InfoBoxProps> = ({
       variant="caption"
       sx={{
         textTransform: "uppercase",
-        color: "text.secondary",
-        fontWeight: 600,
-        fontSize: 10,
+        color: "#94A3B8",
+        fontWeight: 700,
+        fontSize: 9.5,
+        letterSpacing: "0.4px",
       }}
     >
       {label}
@@ -72,11 +67,11 @@ const InfoBox: React.FC<InfoBoxProps> = ({
         size="small"
         sx={{
           mt: 0.5,
-          bgcolor: grey[50],
+          bgcolor: "#fff",
           color: color,
-          fontWeight: "bold",
+          fontWeight: 700,
           border: `1px solid ${borderColor}`,
-          fontSize: 12,
+          fontSize: 11,
         }}
       />
     ) : (
@@ -84,6 +79,12 @@ const InfoBox: React.FC<InfoBoxProps> = ({
     )}
   </Box>
 );
+
+const STATUS_HEADER: Record<string, string> = {
+  Active:    "#059669",
+  "On Hold": "#D97706",
+  Complete:  "#4F46E5",
+};
 
 const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
   const { users } = useApp();
@@ -107,51 +108,59 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
   }, [navigate, project.id]);
 
   const teamMembers = project.teamMembers ?? [];
+  const headerGrad = STATUS_HEADER[project.status];
 
   return (
     <>
       <Card
         onDoubleClick={handleCardDoubleClick}
-        elevation={6}
+        elevation={0}
         sx={{
           width: 280,
           minHeight: 260,
           borderRadius: 3,
-          bgcolor: grey[50],
+          overflow: "hidden",
+          bgcolor: "#fff",
           border: `1px solid ${grey[200]}`,
           cursor: "pointer",
           transition: "transform 0.3s, box-shadow 0.3s",
-          "&:hover": { transform: "translateY(-4px)", boxShadow: 8 },
+          boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+          "&:hover": { transform: "translateY(-4px)", boxShadow: "0 10px 28px rgba(0,0,0,0.12)" },
         }}
       >
-        <CardContent sx={{ p: 2 }}>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={1}
+        <Box
+          sx={{
+            background: headerGrad,
+            px: 2,
+            py: 1.2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            fontWeight={700}
+            noWrap
+            sx={{ color: "#fff", textShadow: "0 1px 3px rgba(0,0,0,0.2)", fontSize: 15, flex: 1, pr: 1 }}
           >
-            <Typography
-              variant="subtitle1"
-              fontWeight={600}
-              color={blue[700]}
-              noWrap
-            >
-              {project.name}
-            </Typography>
+            {project.name}
+          </Typography>
 
-            <Edit
-              sx={{
-                cursor: "pointer",
-                color: blue[600],
-                fontSize: 20,
-                "&:hover": { color: blue[800] },
-              }}
-              onClick={handleEditClick}
-            />
-          </Box>
+          <Edit
+            onClick={handleEditClick}
+            sx={{
+              cursor: "pointer",
+              color: "rgba(255,255,255,0.85)",
+              fontSize: 19,
+              flexShrink: 0,
+              "&:hover": { color: "#fff" },
+            }}
+          />
+        </Box>
 
-          <Divider sx={{ my: 1 }} />
+        <CardContent sx={{ p: 2 }}>
+          <Divider sx={{ mb: 1.5, borderColor: grey[100] }} />
 
           <Grid container spacing={1}>
             <Grid sx={{ xs: 6 }}>
@@ -168,11 +177,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
               <InfoBox
                 label="Stories"
                 value={
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight="bold"
-                    color={blue[700]}
-                  >
+                  <Typography variant="subtitle1" fontWeight="bold" color={blue[700]}>
                     {project.userStories.length}
                   </Typography>
                 }
@@ -204,16 +209,12 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
                           height: 24,
                           fontSize: 12,
                           border: "2px solid white",
+                          boxShadow: "0 0 0 1px rgba(0,0,0,0.08)",
                         },
                       }}
                     >
                       {teamMembers.map((user) => (
-                        <Avatar
-                          key={user.id}
-                          sx={{
-                            bgcolor: user.avatarColor,
-                          }}
-                        >
+                        <Avatar key={user.id} sx={{ bgcolor: user.avatarColor }}>
                           {user.name.charAt(0).toUpperCase()}
                         </Avatar>
                       ))}
@@ -230,12 +231,11 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
             </Grid>
           </Grid>
 
-          <Divider sx={{ my: 1.5 }} />
+          <Divider sx={{ my: 1.5, borderColor: grey[100] }} />
+
           <Stack direction="row" spacing={1} alignItems="center">
-            <FreeCancellationSharpIcon
-              sx={{ color: green[400], fontSize: 18 }}
-            />
-            <Typography variant="caption" fontWeight={500} color={grey[600]}>
+            <FreeCancellationSharpIcon sx={{ color: green[400], fontSize: 18 }} />
+            <Typography variant="caption" fontWeight={500} color={grey[500]}>
               {formattedCreated}
             </Typography>
           </Stack>

@@ -9,6 +9,7 @@ import {
   Stack,
   Menu,
   Avatar,
+  Chip,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useApp } from "../Context";
@@ -17,144 +18,165 @@ import Navbar from "../Components/Layout/Navbar";
 import Sidebar from "../Components/Layout/Sidebar";
 import InfoBar from "../Components/Layout/InfoBar";
 import ErrorComponent from "../Components/Layout/ErrorComponent";
-import { blue, grey } from "@mui/material/colors";
 import AddUserStory from "./AddUserStory";
 import type { User, UserStoryStatus, Priority } from "../Models";
+import AddIcon from "@mui/icons-material/Add";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import TuneIcon from "@mui/icons-material/Tune";
 
-const STATUSES: UserStoryStatus[] = [
-  "Backlog",
-  "In Progress",
-  "Testing",
-  "Completed",
-];
+const STATUSES: UserStoryStatus[] = ["Backlog", "In Progress", "Testing", "Completed"];
 
-const ROLE_COLORS: Record<string, string> = {
-  Manager: "error.main",
-  Developer: "primary.main",
-  Tester: "warning.main",
+const ROLE_COLORS: Record<string, { color: string; bg: string }> = {
+  Manager:   { color: "#991B1B", bg: "#FEE2E2" },
+  Developer: { color: "#1D4ED8", bg: "#DBEAFE" },
+  Tester:    { color: "#92400E", bg: "#FEF3C7" },
 };
 
 const KanbanBoard: React.FC = () => {
   const { id } = useParams();
   const { projects } = useApp();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen]       = useState(false);
   const [selectedPriority, setSelectedPriority] = useState<"all" | Priority>("all");
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl]             = useState<null | HTMLElement>(null);
 
   const project = projects.find((p) => String(p.id) === id);
 
-  if (!project) {
-    return <ErrorComponent title="Page Not Found" />;
-  }
+  if (!project) return <ErrorComponent title="Page Not Found" />;
 
-  const priorities = Array.from(
-    new Set(project.userStories.map((s) => s.priority)),
-  );
+  const priorities = Array.from(new Set(project.userStories.map((s) => s.priority)));
 
   const filteredStories = (status: UserStoryStatus) =>
     project.userStories.filter(
-      (s) =>
-        s.status === status &&
-        (selectedPriority === "all" || s.priority === selectedPriority),
+      (s) => s.status === status && (selectedPriority === "all" || s.priority === selectedPriority),
     );
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  const handleMenuOpen  = (e: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(e.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <Navbar />
       <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
         <Sidebar />
+
         <Box
           sx={{
             flex: 1,
             display: "flex",
             flexDirection: "column",
             overflowY: "auto",
-            bgcolor: blue[50],
+            bgcolor: "#F8FAFC",
           }}
         >
           <InfoBar />
           <Box
             sx={{
-              bgcolor: grey[50],
               width: "98%",
-              height: 50,
               px: 2,
-              py: 2,
+              py: 1.5,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              bgcolor: "#fff",
+              borderBottom: "1px solid #E2E8F0",
             }}
           >
-            <FormControl size="small" sx={{ minWidth: 200 }}>
-              <TextField
-                select
-                value={selectedPriority}
-                onChange={(e) =>
-                  setSelectedPriority(e.target.value as "all" | Priority)
-                }
-                label="Priority"
-                size="small"
-              >
-                <MenuItem value="all">All Priorities</MenuItem>
-                {priorities.map((priority) => (
-                  <MenuItem key={priority} value={priority}>
-                    {priority}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </FormControl>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <TuneIcon sx={{ color: "#6366F1", fontSize: 20 }} />
+              <FormControl size="small" sx={{ minWidth: 180 }}>
+                <TextField
+                  select
+                  value={selectedPriority}
+                  onChange={(e) => setSelectedPriority(e.target.value as "all" | Priority)}
+                  label="Priority"
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      "&.Mui-focused fieldset": { borderColor: "#6366F1" },
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": { color: "#6366F1" },
+                  }}
+                >
+                  <MenuItem value="all">All Priorities</MenuItem>
+                  {priorities.map((priority) => (
+                    <MenuItem key={priority} value={priority}>{priority}</MenuItem>
+                  ))}
+                </TextField>
+              </FormControl>
+            </Box>
 
             <Box>
               <Button
                 variant="outlined"
                 size="small"
+                startIcon={<PeopleAltIcon />}
                 onClick={handleMenuOpen}
-                sx={{ minWidth: 200 }}
+                sx={{
+                  minWidth: 180,
+                  borderRadius: "10px",
+                  borderColor: "#C7D2FE",
+                  color: "#4F46E5",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  fontSize: 13,
+                  "&:hover": { bgcolor: "#EEF2FF", borderColor: "#818CF8" },
+                }}
               >
                 View Team Members
               </Button>
+
               <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
-                PaperProps={{ sx: { width: 250 } }}
+                PaperProps={{
+                  sx: {
+                    width: 250,
+                    borderRadius: "12px",
+                    border: "1px solid #E2E8F0",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+                    mt: 0.5,
+                  },
+                }}
               >
-                {project.teamMembers.map((member: User) => (
-                  <MenuItem key={member.id} disableRipple>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Avatar
-                        sx={{
-                          width: 30,
-                          height: 30,
-                          fontSize: 15,
-                          fontWeight: "bold",
-                          bgcolor: member.avatarColor,
-                        }}
-                      >
-                        {member.name[0]}
-                      </Avatar>
-                      <Typography>{member.name}</Typography>
-                      <Typography
-                        sx={{
-                          color: ROLE_COLORS[member.role] ?? "text.primary",
-                          fontWeight: 600,
-                          ml: 1,
-                        }}
-                      >
-                        ({member.role})
-                      </Typography>
-                    </Stack>
-                  </MenuItem>
-                ))}
+                {project.teamMembers.map((member: User) => {
+                  const roleCfg = ROLE_COLORS[member.role] ?? { color: "#475569", bg: "#F1F5F9" };
+                  return (
+                    <MenuItem key={member.id} disableRipple sx={{ py: 1 }}>
+                      <Stack direction="row" spacing={1.2} alignItems="center">
+                        <Avatar
+                          sx={{
+                            width: 30,
+                            height: 30,
+                            fontSize: 14,
+                            fontWeight: 700,
+                            bgcolor: member.avatarColor,
+                          }}
+                        >
+                          {member.name[0]}
+                        </Avatar>
+                        <Typography sx={{ fontSize: 13, fontWeight: 500, color: "#1E293B" }}>
+                          {member.name}
+                        </Typography>
+                        <Chip
+                          label={member.role}
+                          size="small"
+                          sx={{
+                            height: 20,
+                            fontSize: 10,
+                            fontWeight: 700,
+                            bgcolor: roleCfg.bg,
+                            color: roleCfg.color,
+                            border: "none",
+                            "& .MuiChip-label": { px: 1 },
+                          }}
+                        />
+                      </Stack>
+                    </MenuItem>
+                  );
+                })}
               </Menu>
             </Box>
           </Box>
@@ -164,25 +186,38 @@ const KanbanBoard: React.FC = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              bgcolor: "white",
-              px: 2,
-              py: 1,
+              bgcolor: "#fff",
+              borderBottom: "1px solid #E2E8F0",
+              px: 3,
+              py: 1.2,
             }}
           >
-            <Typography sx={{ fontSize: 25, fontWeight: "bold", color: grey[800] }}>
+            <Typography
+              sx={{
+                fontSize: 22,
+                fontWeight: 700,
+                color: "#1E293B",
+                letterSpacing: "-0.3px",
+              }}
+            >
               {project.name} Board
             </Typography>
+
             <Button
-              sx={{
-                bgcolor: blue[100],
-                color: blue[700],
-                width: 150,
-                height: 45,
-                border: 1,
-                fontWeight: "bold",
-                "&:hover": { bgcolor: blue[200] },
-              }}
+              startIcon={<AddIcon />}
               onClick={() => setIsModalOpen(true)}
+              sx={{
+                bgcolor: "#EEF2FF",
+                color: "#4F46E5",
+                width: 140,
+                height: 40,
+                fontWeight: 700,
+                fontSize: 13,
+                borderRadius: "10px",
+                textTransform: "none",
+                border: "1px solid #C7D2FE",
+                "&:hover": { bgcolor: "#C7D2FE" },
+              }}
             >
               Add Story
             </Button>
@@ -196,7 +231,17 @@ const KanbanBoard: React.FC = () => {
             />
           )}
 
-          <Box sx={{ display: "flex", gap: 2, px: 3, py: 2, overflowX: "auto" }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              px: 3,
+              py: 2,
+              overflowX: "auto",
+              "&::-webkit-scrollbar": { height: 6 },
+              "&::-webkit-scrollbar-thumb": { bgcolor: "#CBD5E1", borderRadius: 3 },
+            }}
+          >
             {STATUSES.map((status) => (
               <KanbanColumn
                 key={status}

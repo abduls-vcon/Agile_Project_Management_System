@@ -128,10 +128,7 @@ const UpdateProjectDialog: React.FC<Props> = ({ open, onClose, project }) => {
                 </MenuItem>
               ))}
           </TextField>
-
           <Divider />
-
-          {/* Current Team Members */}
           <Box>
             <Typography variant="subtitle2" fontWeight={700} mb={1}>
               Team Members
@@ -175,8 +172,6 @@ const UpdateProjectDialog: React.FC<Props> = ({ open, onClose, project }) => {
               )}
             </Box>
           </Box>
-
-          {/* Add Members — multiple select stays open on each click */}
           {availableToAdd.length > 0 && (
             <FormControl fullWidth>
               <InputLabel>Add Team Members</InputLabel>

@@ -1,4 +1,4 @@
-import React, { useState,useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Navbar from "../Components/Layout/Navbar";
 import Sidebar from "../Components/Layout/Sidebar";
 import InfoBar from "../Components/Layout/InfoBar";
@@ -10,8 +10,6 @@ import type { Project } from "../Models";
 
 import {
   Button,
-  InputLabel,
-  Select,
   MenuItem,
   Box,
   FormControl,
@@ -19,8 +17,17 @@ import {
   Grid,
   CircularProgress,
 } from "@mui/material";
+import TuneIcon from "@mui/icons-material/Tune";
 
-import { blue, grey } from "@mui/material/colors";
+const inputSx = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "10px",
+    bgcolor: "#fff",
+    "&.Mui-focused fieldset": { borderColor: "#6366F1" },
+    "& fieldset": { borderColor: "#E2E8F0" },
+  },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#6366F1" },
+};
 
 const ProjectView: React.FC = () => {
   const { users, projects } = useApp();
@@ -29,20 +36,16 @@ const ProjectView: React.FC = () => {
   const [status, setStatus] = useState<string>("All");
   const [selectedUser, setSelectedUser] = useState<number | "all">("all");
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const[loading,setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
-     const timer = setTimeout(()=> setLoading(false),3000);
-     return ()=> clearTimeout(timer);
-   })
-
-  const handleStatusChange = (event: any) => {
-    setStatus(event.target.value);
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (!projects || !users) {
-  return <ErrorComponent title="Something went wrong" />;
-}
+    return <ErrorComponent title="Something went wrong !" />;
+  }
 
   const filteredProjects = useMemo(() => {
     return projects.filter((project: Project) => {
@@ -51,129 +54,150 @@ const ProjectView: React.FC = () => {
         selectedUser === "all" || project.ownerId === selectedUser;
       const dateMatch =
         !selectedDate || project.createdDate?.startsWith(selectedDate);
+
       return statusMatch && userMatch && dateMatch;
     });
   }, [projects, status, selectedUser, selectedDate]);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", overflowX: "hidden" }}>
-  <Navbar />
-  <Box sx={{ display: "flex", flex: 1 }}>
-    <Sidebar />
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <Navbar />
 
-    <Box
-      sx={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        overflowY: "auto",
-        bgcolor: blue[50],
-      }}
-    >
-      <InfoBar />
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 2,
-          px: { xs: 2, sm: 3, md: 5 },
-          py: 2,
-          bgcolor: grey[50],
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+      <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        <Sidebar />
+
         <Box
           sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
-            alignItems: "center",
             flex: 1,
-            minWidth: 0,
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+            bgcolor: "#F8FAFC",
           }}
         >
-          <FormControl sx={{ minWidth: 180, height: 45 }}>
-            <InputLabel>Status</InputLabel>
-            <Select
-              value={status}
-              label="Status"
-              onChange={handleStatusChange}
-              sx={{ height: 45 }}
-            >
-              <MenuItem value="All">All</MenuItem>
-              <MenuItem value="Active">Active</MenuItem>
-              <MenuItem value="Complete">Complete</MenuItem>
-              <MenuItem value="On Hold">On Hold</MenuItem>
-            </Select>
-          </FormControl>
-
-          <TextField
-            select
-            label="Filter by Owner"
-            value={selectedUser}
-            onChange={(e) =>
-              setSelectedUser(e.target.value === "all" ? "all" : Number(e.target.value))
-            }
-            size="small"
-            sx={{ minWidth: 180, height: 45 }}
-            InputProps={{ sx: { height: 45 } }}
-            InputLabelProps={{ sx: { top: -6 } }}
+          <InfoBar />
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              bgcolor: "#fff",
+              borderBottom: "1px solid #E2E8F0",
+              px: 3,
+              py: 1.5,
+              gap: 2,
+              flexWrap: "wrap",
+            }}
           >
-            <MenuItem value="all">All Users</MenuItem>
-            {users.map((user) => (
-              <MenuItem key={user.id} value={user.id}>
-                {user.name}
-              </MenuItem>
-            ))}
-          </TextField>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <TuneIcon sx={{ color: "#6366F1", fontSize: 20 }} />
+              <FormControl size="small" sx={{ minWidth: 180 }}>
+                <TextField
+                  select
+                  value={status}
+                  label="Status"
+                  onChange={(e) => setStatus(e.target.value)}
+                  sx={inputSx}
+                >
+                  <MenuItem value="All">All</MenuItem>
+                  <MenuItem value="Active">Active</MenuItem>
+                  <MenuItem value="Complete">Complete</MenuItem>
+                  <MenuItem value="On Hold">On Hold</MenuItem>
+                </TextField>
+              </FormControl>
 
-          <TextField
-            label="Filter by Creation Date"
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            size="small"
-            sx={{ minWidth: 180, height: 45 }}
-            InputLabelProps={{ shrink: true, sx: { top: -6 } }}
-            InputProps={{ sx: { height: 45 } }}
-          />
-        </Box>
+              <FormControl size="small" sx={{ minWidth: 180 }}>
+                <TextField
+                  select
+                  label="Owner"
+                  value={selectedUser}
+                  onChange={(e) =>
+                    setSelectedUser(
+                      e.target.value === "all"
+                        ? "all"
+                        : Number(e.target.value)
+                    )
+                  }
+                  sx={inputSx}
+                >
+                  <MenuItem value="all">All Users</MenuItem>
 
-        <Button
-          sx={{
-            bgcolor: blue[100],
-            color: blue[700],
-            width: { xs: "100%", sm: 150 },
-            height: 45,
-            fontWeight: "bold",
-            "&:hover": { bgcolor: blue[200] },
-            mt: { xs: 1, sm: 0 },
-          }}
-          onClick={() => setOpenDialog(true)}
-        >
-          Add Project
-        </Button>
+                  {users.map((user) => (
+                    <MenuItem key={user.id} value={user.id}>
+                      {user.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </FormControl>
 
-        <AddProject open={openDialog} onClose={() => setOpenDialog(false)} />
-      </Box>
+              <TextField
+                label="Creation Date"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                size="small"
+                InputLabelProps={{ shrink: true }}
+                sx={{ minWidth: 180, ...inputSx }}
+              />
+            </Box>
 
-      <Box sx={{ flex: 1, p: { xs: 2, sm: 5 }, display: "flex", justifyContent: "center" }}>
-        {loading ? (
-          <CircularProgress size={80} thickness={5} sx={{ color: blue[700] }} />
-        ) : (
-          <Grid container spacing={4} justifyContent="left" sx={{ width: "100%", maxWidth: "1400px" }}>
-            {filteredProjects.map((project) => (
-              <Grid key={project.id} sx={{ xs:12, sm:6, md:4, lg:3}}>
-                <ProjectCard project={project} />
+            <Button
+              onClick={() => setOpenDialog(true)}
+              sx={{
+                bgcolor: "#EEF2FF",
+                color: "#4F46E5",
+                width: 140,
+                height: 40,
+                fontWeight: 700,
+                fontSize: 13,
+                borderRadius: "10px",
+                textTransform: "none",
+                border: "1px solid #C7D2FE",
+                "&:hover": { bgcolor: "#C7D2FE" },
+              }}
+            >
+              Add Project
+            </Button>
+
+            <AddProject
+              open={openDialog}
+              onClose={() => setOpenDialog(false)}
+            />
+          </Box>
+          <Box
+            sx={{
+              px: 3,
+              py: 2,
+            }}
+          >
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+                <CircularProgress
+                  size={70}
+                  thickness={5}
+                  sx={{ color: "#6366F1" }}
+                />
+              </Box>
+            ) : (
+              <Grid container spacing={3}>
+                {filteredProjects.map((project) => (
+                  <Grid sx={{ xs:12, sm:6, md:4, lg:3}} key={project.id}>
+                    <ProjectCard project={project} />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-        )}
+            )}
+          </Box>
+        </Box>
       </Box>
     </Box>
-  </Box>
-</Box>
   );
 };
 

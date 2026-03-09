@@ -17,13 +17,13 @@ import {
   Button,
   MenuItem,
   Stack,
+  Chip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CodeIcon from "@mui/icons-material/Code";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import { blue, grey} from "@mui/material/colors";
 import { useApp } from "../../Context";
 import type { User } from "../../Models";
 
@@ -31,17 +31,28 @@ interface UserItemsProps {
   users: User[];
 }
 
+const ROLE_CONFIG: Record<string, { color: string; bg: string; border: string; iconColor: string }> = {
+  Developer: { color: "#1D4ED8", bg: "#DBEAFE", border: "#93C5FD", iconColor: "#2563EB" },
+  Tester:    { color: "#B45309", bg: "#FEF3C7", border: "#FCD34D", iconColor: "#D97706" },
+  Manager:   { color: "#6D28D9", bg: "#EDE9FE", border: "#C4B5FD", iconColor: "#7C3AED" },
+};
+
 const roleIcon = (role: string) => {
+  const cfg = ROLE_CONFIG[role];
   switch (role) {
-    case "Developer":
-      return <CodeIcon color="primary" fontSize="large" />;
-    case "Tester":
-      return <BugReportIcon color="error" fontSize="large" />;
-    case "Manager":
-      return <ManageAccountsIcon color="secondary" fontSize="large" />;
-    default:
-      return null;
+    case "Developer": return <CodeIcon sx={{ color: cfg?.iconColor, fontSize: 26 }} />;
+    case "Tester":    return <BugReportIcon sx={{ color: cfg?.iconColor, fontSize: 26 }} />;
+    case "Manager":   return <ManageAccountsIcon sx={{ color: cfg?.iconColor, fontSize: 26 }} />;
+    default:          return null;
   }
+};
+
+const inputSx = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "10px",
+    "&.Mui-focused fieldset": { borderColor: "#6366F1" },
+  },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#6366F1" },
 };
 
 const UserItems: React.FC<UserItemsProps> = ({ users }) => {
@@ -64,8 +75,7 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
 
   const handleUpdate = () => {
     if (selectedUser) {
-      const updatedUser = { ...selectedUser, ...formData };
-      updateUser(updatedUser);
+      updateUser({ ...selectedUser, ...formData });
       handleClose();
     }
   };
@@ -83,82 +93,126 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
   return (
     <Box sx={{ my: 1, p: 1 }}>
       <Grid container spacing={2} justifyContent="center">
-        {users.map((user) => (
-          <Grid sx={{ xs: 12, sm: 6, md: 4, lg: 3, mx:1}} key={user.id}>
-            <Card
-              sx={{
-                display: "flex",
-                px: 2,
-                py: 1.5,
-                borderRadius: 3,
-                boxShadow: 6,
-                borderLeft: `4px solid ${blue[700]}`,
-                height: 60,
-                width: 500,
-                transition: "transform 0.3s, box-shadow 0.3s",
-                "&:hover": { transform: "translateY(-3px)", boxShadow: 12 },
-              }}
-            >
-              <ListItem
-                disableGutters
-                sx={{ display: "flex", alignItems: "center", width: "100%" }}
-                secondaryAction={
-                  <Stack direction="row" spacing={1}>
-                    <IconButton
-                      edge="end"
-                      aria-label="edit"
-                      onClick={() => handleOpen(user)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => deleteUser(user.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Stack>
-                }
+        {users.map((user) => {
+          const roleCfg = ROLE_CONFIG[user.role] ?? { color: "#475569", bg: "#F1F5F9", border: "#E2E8F0", iconColor: "#64748B" };
+          return (
+            <Grid sx={{ xs: 12, sm: 6, md: 4, lg: 3, mx: 1 }} key={user.id}>
+              <Card
+                elevation={0}
+                sx={{
+                  display: "flex",
+                  px: 2,
+                  py: 1.5,
+                  borderRadius: 3,
+                  border: "1px solid",
+                  borderColor: roleCfg.border,
+                  borderLeft: `4px solid ${roleCfg.iconColor}`,
+                  height: 60,
+                  width: 500,
+                  boxShadow: `0 2px 10px ${roleCfg.iconColor}22`,
+                  transition: "transform 0.3s, box-shadow 0.3s",
+                  "&:hover": {
+                    transform: "translateY(-3px)",
+                    boxShadow: `0 8px 24px ${roleCfg.iconColor}33`,
+                  },
+                }}
               >
-                <ListItemAvatar>
-                  <Avatar
-                    sx={{
-                      bgcolor: user.avatarColor,
-                      fontWeight: "bold",
-                      width: 40,
-                      height: 40,
-                      fontSize: "1rem",
-                    }}
-                  >
-                    {user.name.charAt(0).toUpperCase()}
-                  </Avatar>
-                </ListItemAvatar>
-
-                <ListItemText
-                  sx={{ ml: 2 }}
-                  primary={
-                    <Typography sx={{ fontSize: 17, fontWeight: "bold"}}>
-                      {user.name}
-                    </Typography>
+                <ListItem
+                  disableGutters
+                  sx={{ display: "flex", alignItems: "center", width: "100%" }}
+                  secondaryAction={
+                    <Stack direction="row" spacing={0.5}>
+                      <IconButton
+                        edge="end"
+                        aria-label="edit"
+                        onClick={() => handleOpen(user)}
+                        sx={{
+                          color: "#6366F1",
+                          bgcolor: "#EEF2FF",
+                          width: 30, height: 30,
+                          "&:hover": { bgcolor: "#C7D2FE" },
+                        }}
+                      >
+                        <EditIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => deleteUser(user.id)}
+                        sx={{
+                          color: "#EF4444",
+                          bgcolor: "#FEE2E2",
+                          width: 30, height: 30,
+                          "&:hover": { bgcolor: "#FECACA" },
+                        }}
+                      >
+                        <DeleteIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Stack>
                   }
-                  secondary={
-                    <Typography variant="body2" sx={{color:grey[500]}}>
-                      {user.role}
-                    </Typography>
-                  }
-                />
+                >
+                  <ListItemAvatar>
+                    <Avatar
+                      sx={{
+                        bgcolor: user.avatarColor,
+                        fontWeight: "bold",
+                        width: 40,
+                        height: 40,
+                        fontSize: "1rem",
+                        boxShadow: `0 0 0 2px #fff, 0 0 0 3.5px ${roleCfg.border}`,
+                      }}
+                    >
+                      {user.name.charAt(0).toUpperCase()}
+                    </Avatar>
+                  </ListItemAvatar>
 
-                <Box sx={{ ml: "auto", mr: 8 }}>{roleIcon(user.role)}</Box>
-              </ListItem>
-            </Card>
-          </Grid>
-        ))}
+                  <ListItemText
+                    sx={{ ml: 2 }}
+                    primary={
+                      <Typography sx={{ fontSize: 15, fontWeight: 700, color: "#1E293B" }}>
+                        {user.name}
+                      </Typography>
+                    }
+                    secondary={
+                      <Chip
+                        label={user.role}
+                        size="small"
+                        sx={{
+                          mt: 0.3,
+                          height: 18,
+                          fontSize: 10,
+                          fontWeight: 700,
+                          bgcolor: roleCfg.bg,
+                          color: roleCfg.color,
+                          border: `1px solid ${roleCfg.border}`,
+                          "& .MuiChip-label": { px: 1 },
+                        }}
+                      />
+                    }
+                  />
+
+                  <Box sx={{ ml: "auto", mr: 8 }}>{roleIcon(user.role)}</Box>
+                </ListItem>
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>Edit User</DialogTitle>
-        <DialogContent>
+        <DialogTitle
+          sx={{
+            fontWeight: 700,
+            fontSize: 16,
+            bgcolor: "#EEF2FF",
+            color: "#4F46E5",
+            borderBottom: "1px solid #C7D2FE",
+          }}
+        >
+          Edit User
+        </DialogTitle>
+
+        <DialogContent sx={{ bgcolor: "#FAFAFA" }}>
           <TextField
             margin="dense"
             label="Name"
@@ -166,6 +220,7 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
             value={formData.name}
             onChange={handleChange}
             fullWidth
+            sx={inputSx}
           />
           <TextField
             margin="dense"
@@ -175,6 +230,7 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
             value={formData.role}
             onChange={handleChange}
             fullWidth
+            sx={inputSx}
           >
             <MenuItem value="Developer">Developer</MenuItem>
             <MenuItem value="Tester">Tester</MenuItem>
@@ -188,14 +244,36 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
             onChange={handleChange}
             type="color"
             fullWidth
-            sx={{ mt: 1 }}
+            sx={{ mt: 1, ...inputSx }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="inherit">
+
+        <DialogActions sx={{ px: 3, py: 2, bgcolor: "#FAFAFA", borderTop: "1px solid #E2E8F0", gap: 1 }}>
+          <Button
+            onClick={handleClose}
+            sx={{
+              borderRadius: "10px",
+              textTransform: "none",
+              fontWeight: 600,
+              color: "#64748B",
+              border: "1px solid #E2E8F0",
+              "&:hover": { bgcolor: "#F1F5F9" },
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={handleUpdate} variant="contained">
+          <Button
+            onClick={handleUpdate}
+            variant="contained"
+            sx={{
+              borderRadius: "10px",
+              textTransform: "none",
+              fontWeight: 700,
+              bgcolor: "#4F46E5",
+              boxShadow: "none",
+              "&:hover": { bgcolor: "#4338CA", boxShadow: "none" },
+            }}
+          >
             Update
           </Button>
         </DialogActions>
