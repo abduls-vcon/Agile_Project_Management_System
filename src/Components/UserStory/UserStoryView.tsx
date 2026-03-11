@@ -1,168 +1,268 @@
 import React from "react";
+import Grid from "@mui/material/Grid";
 import {
   Card,
   CardContent,
   Typography,
   Box,
   Chip,
-  Avatar,
-  Divider,
   Stack,
+  Divider,
+  Avatar,
 } from "@mui/material";
+import { grey, blue, orange, green, red } from "@mui/material/colors";
+import PestControlIcon from "@mui/icons-material/PestControl";
+import DescriptionIcon from "@mui/icons-material/Description";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { useApp } from "../../Context";
 import type { UserStory } from "../../Models";
-import PestControlIcon from '@mui/icons-material/PestControl';
-import DescriptionIcon from '@mui/icons-material/Description';
 
-interface UserViewProps {
+interface UserStoryViewProps {
   story: UserStory;
   projectId: number;
   onClose: () => void;
 }
 
-const UserStoryView: React.FC<UserViewProps> = ({ story, projectId }) => {
+interface InfoBoxProps {
+  label: string;
+  value: React.ReactNode;
+  bgColor: string;
+  borderColor: string;
+  color?: string;
+}
+
+const InfoBox: React.FC<InfoBoxProps> = ({ label, value, bgColor, borderColor, color }) => (
+  <Box
+    sx={{
+      p: 1.2,
+      borderRadius: 2,
+      bgcolor: bgColor,
+      border: `1px solid ${borderColor}`,
+      display: "flex",
+      flexDirection: "column",
+      gap: 0.5,
+      transition: "transform 0.3s, box-shadow 0.2s",
+      "&:hover": { transform: "translateY(-2px)", boxShadow: `0 4px 10px ${borderColor}99` },
+      width: 95,
+    }}
+  >
+    <Typography
+      variant="caption"
+      sx={{
+        textTransform: "uppercase",
+        color: "#94A3B8",
+        fontWeight: 700,
+        fontSize: 9.5,
+        letterSpacing: "0.4px",
+      }}
+    >
+      {label}
+    </Typography>
+
+    {typeof value === "string" || typeof value === "number" ? (
+      <Chip
+        label={value}
+        size="small"
+        sx={{
+          mt: 0.5,
+          bgcolor: "#fff",
+          color: color,
+          fontWeight: 700,
+          border: `1px solid ${borderColor}`,
+          fontSize: 11,
+        }}
+      />
+    ) : (
+      <Box mt={0.5}>{value}</Box>
+    )}
+  </Box>
+);
+
+const STATUS_HEADER: Record<string, string> = {
+  "Backlog":     "#64748B",
+  "In Progress": "#2563EB",
+  "Testing":     "#D97706",
+  "Completed":   "#059669",
+};
+
+const UserStoryView: React.FC<UserStoryViewProps> = ({ story, projectId }) => {
   const { users, projects } = useApp();
 
   const assignedUser = users.find((u) => u.id === story.assignedTo);
   const project = projects.find((p) => p.id === projectId);
 
-  const getStatusColor = () => {
-    switch (story.status) {
-      case "Backlog":
-        return "#9e9e9e";
-      case "In Progress":
-        return "#1976d2";
-      case "Testing":
-        return "#ed6c02";
-      case "Completed":
-        return "#2e7d32";
-      default:
-        return "#9e9e9e";
+  const getPriorityColors = () => {
+    switch (story.priority) {
+      case "Low":    return { bg: green[50],  border: green[200],  color: green[700] };
+      case "Medium": return { bg: orange[50], border: orange[200], color: orange[800] };
+      case "High":   return { bg: red[50],    border: red[200],    color: red[700] };
+      default:       return { bg: grey[50],   border: grey[200],   color: grey[700] };
     }
   };
 
-  const getPriorityColor = () => {
-    switch (story.priority) {
-      case "Low":
-        return "success";
-      case "Medium":
-        return "warning";
-      case "High":
-        return "error";
-      default:
-        return "default";
-    }
-  };
+  const priorityColors = getPriorityColors();
+  const headerColor = STATUS_HEADER[story.status] ?? "#64748B";
 
   return (
     <Card
+      elevation={0}
       sx={{
-        boxShadow: 6,
-        borderRadius: 3,
+        width: 598,
+        minHeight: 260,
+        borderRadius: 1,
         overflow: "hidden",
+        bgcolor: "#fff",
+        border: `1px solid ${grey[200]}`,
+        cursor: "default",
         transition: "transform 0.3s, box-shadow 0.3s",
-        "&:hover": { boxShadow: 12, transform: "translateY(-3px)" },
+        boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+        "&:hover": { transform: "translateY(-4px)", boxShadow: "0 10px 28px rgba(0,0,0,0.12)" },
       }}
     >
       <Box
         sx={{
-          height: 6,
-          background: `linear-gradient(90deg, ${getStatusColor()} 0%, ${getStatusColor()}90 100%)`,
+          background: headerColor,
+          px: 2,
+          py: 1.2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 1,
         }}
-      />
-
-      <CardContent sx={{ p: 4 }}>
-        <Box display="flex" alignItems="center" mb={1} gap={1}>
-          {story.isBug ? (
-            <PestControlIcon color="error" fontSize="small" />
-          ) : (
-            <DescriptionIcon color="primary" fontSize="small" />
-          )}
-          <Typography variant="caption" color="text.secondary" fontWeight={800}>
-            {story.isBug ? "Bug" : "Story"}
-          </Typography>
-        </Box>
-
-        <Typography variant="h5" fontWeight={700} gutterBottom color="grey.800">
+      >
+        <Typography
+          variant="subtitle1"
+          fontWeight={700}
+          noWrap
+          sx={{
+            color: "#fff",
+            textShadow: "0 1px 3px rgba(0,0,0,0.2)",
+            fontSize: 15,
+            flex: 1,
+            pr: 1,
+          }}
+        >
           {story.title}
         </Typography>
 
-        {project && (
-          <Chip
-            label={project.name}
-            size="small"
-            sx={{
-              mb: 2,
-              bgcolor: "rgba(25,118,210,0.08)",
-              fontWeight: 500,
-            }}
-          />
-        )}
-
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ mb: 3, lineHeight: 1.6 }}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            px: 1,
+            py: 0.4,
+            borderRadius: 1,
+            bgcolor: "rgba(255,255,255,0.15)",
+            flexShrink: 0,
+          }}
         >
-          {story.description}
-        </Typography>
-
-        <Divider sx={{ mb: 3 }} />
-
-        <Stack direction="row" spacing={2} mb={3}>
-          <Chip
-            label={story.status}
+          {story.isBug ? (
+            <PestControlIcon sx={{ fontSize: 13, color: "#fff" }} />
+          ) : (
+            <DescriptionIcon sx={{ fontSize: 13, color: "#fff" }} />
+          )}
+          <Typography
             sx={{
-              bgcolor: getStatusColor(),
+              fontFamily: "monospace",
+              fontSize: "0.62rem",
+              fontWeight: 700,
               color: "#fff",
-              fontWeight: 600,
-              minWidth: 90,
-            }}
-          />
-          <Chip
-            label={story.priority}
-            color={getPriorityColor()}
-            variant="outlined"
-            sx={{
-              fontWeight: 600,
-              minWidth: 90,
-            }}
-          />
-        </Stack>
-
-        {assignedUser && (
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={2}
-            sx={{
-              p: 2,
-              bgcolor: "grey.100",
-              borderRadius: 3,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
             }}
           >
-            <Avatar
-              sx={{
-                bgcolor: assignedUser.avatarColor,
-                width: 48,
-                height: 48,
-                fontWeight: 600,
-                fontSize: 18,
-              }}
-            >
-              {assignedUser.name.charAt(0)}
-            </Avatar>
+            {story.isBug ? "Bug" : "Story"}
+          </Typography>
+        </Box>
+      </Box>
 
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Assigned To
-              </Typography>
-              <Typography fontWeight={600} color="grey.800">
+      <CardContent sx={{ p: 2 }}>
+        <Divider sx={{ mb: 1.5, borderColor: grey[100] }} />
+
+        <Grid container spacing={1}>
+          <Grid sx={{ xs: 6 }}>
+            <InfoBox
+              label="Status"
+              value={story.status}
+              bgColor={green[50]}
+              borderColor={green[200]}
+              color={green[700]}
+            />
+          </Grid>
+
+          <Grid sx={{ xs: 6 }}>
+            <InfoBox
+              label="Priority"
+              value={story.priority}
+              bgColor={priorityColors.bg}
+              borderColor={priorityColors.border}
+              color={priorityColors.color}
+            />
+          </Grid>
+
+          {project && (
+            <Grid sx={{ xs: 12}}>
+              <InfoBox
+                label="Project"
+                value={project.name}
+                bgColor={blue[50]}
+                borderColor={blue[200]}
+                color={blue[700]}
+              />
+            </Grid>
+          )}
+        </Grid>
+
+        <Divider sx={{ my: 1.5, borderColor: grey[100] }} />
+
+        {story.description && (
+          <Typography
+            variant="caption"
+            color={grey[500]}
+            sx={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              lineHeight: 1.6,
+              mb: 1.5,
+              fontSize: "0.72rem",
+            }}
+          >
+            {story.description}
+          </Typography>
+        )}
+
+        <Stack direction="row" spacing={1} alignItems="center">
+          {assignedUser ? (
+            <>
+              <Avatar
+                sx={{
+                  bgcolor: assignedUser.avatarColor,
+                  width: 22,
+                  height: 22,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  border: "2px solid white",
+                  boxShadow: "0 0 0 1px rgba(0,0,0,0.08)",
+                }}
+              >
+                {assignedUser.name.charAt(0).toUpperCase()}
+              </Avatar>
+              <Typography variant="caption" fontWeight={500} color={grey[500]}>
                 {assignedUser.name}
               </Typography>
-            </Box>
-          </Box>
-        )}
+            </>
+          ) : (
+            <>
+              <PersonOutlineIcon sx={{ color: grey[400], fontSize: 18 }} />
+              <Typography variant="caption" fontWeight={500} color={grey[400]}>
+                Unassigned
+              </Typography>
+            </>
+          )}
+        </Stack>
       </CardContent>
     </Card>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -23,6 +23,7 @@ import type { User, UserStoryStatus, Priority } from "../Models";
 import AddIcon from "@mui/icons-material/Add";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import TuneIcon from "@mui/icons-material/Tune";
+import { BounceLoader } from "react-spinners";
 
 const STATUSES: UserStoryStatus[] = ["Backlog", "In Progress", "Testing", "Completed"];
 
@@ -39,6 +40,12 @@ const KanbanBoard: React.FC = () => {
   const [isModalOpen, setIsModalOpen]       = useState(false);
   const [selectedPriority, setSelectedPriority] = useState<"all" | Priority>("all");
   const [anchorEl, setAnchorEl]             = useState<null | HTMLElement>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const project = projects.find((p) => String(p.id) === id);
 
@@ -66,7 +73,7 @@ const KanbanBoard: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             overflowY: "auto",
-            bgcolor: "#F8FAFC",
+            bgcolor: "#dee4ff",
           }}
         >
           <InfoBar />
@@ -231,27 +238,44 @@ const KanbanBoard: React.FC = () => {
             />
           )}
 
-          <Box
-            sx={{
-              display: "flex",
-              gap: 2,
-              px: 3,
-              py: 2,
-              overflowX: "auto",
-              "&::-webkit-scrollbar": { height: 6 },
-              "&::-webkit-scrollbar-thumb": { bgcolor: "#CBD5E1", borderRadius: 3 },
-            }}
-          >
-            {STATUSES.map((status) => (
-              <KanbanColumn
-                key={status}
-                projectId={project.id}
-                status={status}
-                stories={filteredStories(status)}
-                priority={selectedPriority}
-              />
-            ))}
-          </Box>
+          {loading ? (
+            <Box
+              sx={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                bgcolor: "rgba(248,250,252,0.8)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 9999,
+              }}
+            >
+              <BounceLoader color="#6366F1" size={80} />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                px: 3,
+                py: 2,
+                overflowX: "auto"
+              }}
+            >
+              {STATUSES.map((status) => (
+                <KanbanColumn
+                  key={status}
+                  projectId={project.id}
+                  status={status}
+                  stories={filteredStories(status)}
+                  priority={selectedPriority}
+                />
+              ))}
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>

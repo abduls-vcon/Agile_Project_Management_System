@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -6,12 +6,14 @@ import {
   MenuItem,
   TextField,
   Button,
-  CircularProgress,
+  Fade,
 } from "@mui/material";
+import { blue, grey } from "@mui/material/colors";
+import { BounceLoader } from "react-spinners";
+
 import Navbar from "../Components/Layout/Navbar";
 import Sidebar from "../Components/Layout/Sidebar";
 import InfoBar from "../Components/Layout/InfoBar";
-import { blue, grey } from "@mui/material/colors";
 import AddUser from "./AddUser";
 import UserItems from "../Components/User/UserItems";
 import ErrorComponent from "../Components/Layout/ErrorComponent";
@@ -26,18 +28,21 @@ const UserView: React.FC = () => {
   const { users } = useApp();
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
+    const timer = setTimeout(() => setLoading(false), 3000);
     return () => clearTimeout(timer);
   }, []);
 
   if (!users) {
-  return <ErrorComponent title="Something went wrong" />;
-}
+    return <ErrorComponent title="Something went wrong" />;
+  }
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
-      const roleMatch = selectedRole === "all" ? true : user.role === selectedRole;
-      const nameMatch = user.name.toLowerCase().includes(searchName.toLowerCase());
+      const roleMatch =
+        selectedRole === "all" ? true : user.role === selectedRole;
+      const nameMatch = user.name
+        .toLowerCase()
+        .includes(searchName.toLowerCase());
       return roleMatch && nameMatch;
     });
   }, [users, selectedRole, searchName]);
@@ -54,7 +59,8 @@ const UserView: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             overflowY: "auto",
-            bgcolor: blue[50],
+            bgcolor: "#dee4ff",
+            position: "relative",
           }}
         >
           <InfoBar />
@@ -72,7 +78,16 @@ const UserView: React.FC = () => {
               boxShadow: 2,
             }}
           >
-            <Typography sx={{ fontSize: 26, fontWeight: 600 }}>User List</Typography>
+            <Typography
+              sx={{
+                fontSize: 26,
+                fontWeight: 600,
+                color: blue[900],
+                letterSpacing: "-0.3px",
+              }}
+            >
+              User List
+            </Typography>
 
             <Box
               sx={{
@@ -87,16 +102,36 @@ const UserView: React.FC = () => {
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
                 size="small"
-                sx={{ minWidth: 200 }}
+                sx={{
+                  minWidth: 200,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    bgcolor: "#fff",
+                    "&.Mui-focused fieldset": { borderColor: "#6366F1" },
+                    "& fieldset": { borderColor: "#E2E8F0" },
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": { color: "#6366F1" },
+                }}
               />
 
               <FormControl size="small" sx={{ minWidth: 180 }}>
                 <TextField
                   select
                   value={selectedRole}
-                  onChange={(e) => setSelectedRole(e.target.value as "all" | string)}
+                  onChange={(e) =>
+                    setSelectedRole(e.target.value as "all" | string)
+                  }
                   label="Filter by Role"
                   size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      bgcolor: "#fff",
+                      "&.Mui-focused fieldset": { borderColor: "#6366F1" },
+                      "& fieldset": { borderColor: "#E2E8F0" },
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": { color: "#6366F1" },
+                  }}
                 >
                   <MenuItem value="all">All Roles</MenuItem>
                   <MenuItem value="Developer">Developer</MenuItem>
@@ -107,36 +142,50 @@ const UserView: React.FC = () => {
 
               <Button
                 sx={{
-                  bgcolor: blue[700],
-                  color: "#fff",
+                  bgcolor: "#EEF2FF",
+                  color: "#4F46E5",
                   width: 140,
                   height: 40,
-                  fontWeight: 600,
-                  "&:hover": { bgcolor: blue[800] },
+                  fontWeight: 700,
+                  fontSize: 13,
+                  borderRadius: "10px",
+                  textTransform: "none",
+                  border: "1px solid #C7D2FE",
+                  "&:hover": { bgcolor: "#C7D2FE" },
                 }}
                 onClick={() => setOpenDialog(true)}
               >
                 Add User
               </Button>
+
               <AddUser open={openDialog} onClose={() => setOpenDialog(false)} />
             </Box>
           </Box>
 
-          <Box
-            sx={{
-              p: 3,
-              minHeight: 400,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "flex-start",
-            }}
-          >
-            {loading ? (
-              <CircularProgress size={80} thickness={5} sx={{ color: blue[700], mt:30 }} />
-            ) : (
+          {loading ? (
+            <Fade in={loading}>
+              <Box
+                sx={{
+                  position: "fixed",
+                  top: 0,
+                  left: 0,
+                  width: "100vw",
+                  height: "100vh",
+                  bgcolor: "rgba(248,250,252,0.8)",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  zIndex: 9999,
+                }}
+              >
+                <BounceLoader color="#6366F1" size={80} />
+              </Box>
+            </Fade>
+          ) : (
+            <Box sx={{ px: 3, py: 2 }}>
               <UserItems users={filteredUsers} />
-            )}
-          </Box>
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>

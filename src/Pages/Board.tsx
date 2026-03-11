@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Box,
   Button,
@@ -16,6 +16,7 @@ import type { UserStoryStatus } from "../Models";
 import ErrorComponent from "../Components/Layout/ErrorComponent";
 import AddIcon from "@mui/icons-material/Add";
 import TuneIcon from "@mui/icons-material/Tune";
+import { BounceLoader } from "react-spinners";
 
 const STATUSES: UserStoryStatus[] = ["Backlog", "In Progress", "Testing", "Completed"];
 
@@ -36,6 +37,12 @@ const Board: React.FC = () => {
   );
   const [selectedPriority, setSelectedPriority] = useState<"all" | string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const project = useMemo(
     () => projects.find((p) => p.id === selectedProjectId),
@@ -60,7 +67,7 @@ const Board: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             overflowY: "auto",
-            bgcolor: "#F8FAFC",
+            bgcolor: "#dee4ff",
           }}
         >
           <InfoBar />
@@ -138,31 +145,50 @@ const Board: React.FC = () => {
               />
             )}
           </Box>
-          <Box
-            sx={{
-              display: "flex",
-              gap: 2,
-              px: 3,
-              py: 2,
-              overflowX: "auto",
-              "&::-webkit-scrollbar": { height: 6 },
-              "&::-webkit-scrollbar-thumb": { bgcolor: "#CBD5E1", borderRadius: 3 },
-            }}
-          >
-            {STATUSES.map((status) => (
-              <KanbanColumn
-                key={status}
-                projectId={project.id}
-                status={status}
-                priority={selectedPriority}
-                stories={project.userStories.filter(
-                  (s) =>
-                    s.status === status &&
-                    (selectedPriority === "all" ? true : s.priority === selectedPriority)
-                )}
-              />
-            ))}
-          </Box>
+          {loading ? (
+            <Box
+              sx={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                bgcolor: "rgba(248,250,252,0.8)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 9999,
+              }}
+            >
+              <BounceLoader color="#6366F1" size={80} />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                px: 3,
+                py: 2,
+                overflowX: "auto",
+                "&::-webkit-scrollbar": { height: 6 },
+                "&::-webkit-scrollbar-thumb": { bgcolor: "#CBD5E1", borderRadius: 3 },
+              }}
+            >
+              {STATUSES.map((status) => (
+                <KanbanColumn
+                  key={status}
+                  projectId={project.id}
+                  status={status}
+                  priority={selectedPriority}
+                  stories={project.userStories.filter(
+                    (s) =>
+                      s.status === status &&
+                      (selectedPriority === "all" ? true : s.priority === selectedPriority)
+                  )}
+                />
+              ))}
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>

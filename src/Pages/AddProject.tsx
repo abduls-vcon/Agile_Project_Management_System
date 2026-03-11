@@ -1,207 +1,388 @@
-import React, { useState } from "react";
-import { useApp } from "../Context";
-import type { Project, User } from "../Models";
+import React, { useMemo, useState } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
+  Button,
   TextField,
+  MenuItem,
+  Box,
+  Typography,
+  Chip,
+  Avatar,
+  Divider,
   FormControl,
   InputLabel,
   Select,
-  MenuItem,
-  Stack,
-  Button,
-  Typography,
+  FormHelperText,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
+import { useApp } from "../Context";
+import type { Project, User } from "../Models";
 
 interface AddProjectProps {
   open: boolean;
   onClose: () => void;
 }
 
+const statusOptions = ["Active", "Complete", "On Hold"];
+
+const ROLE_COLORS: Record<string, string> = {
+  Manager: "#ef4444",
+  Developer: "#3b82f6",
+  Tester: "#f59e0b",
+};
+
+const STATUS_HEADER: Record<string, string> = {
+  Active: "#059669",
+  "On Hold": "#D97706",
+  Complete: "#4F46E5",
+};
+
+const inputSx = {
+  "& .MuiOutlinedInput-root": { borderRadius: "10px", fontSize: 13 },
+  "& .MuiInputLabel-root": { fontSize: 13 },
+};
+
 const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
   const { addProject, users } = useApp();
-  const todayString = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0];
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("Active");
-  const [selectedOwnerId, setSelectedOwnerId] = useState<number | null>(null);
-  const [selectedTeamMembers, setSelectedTeamMembers] = useState<User[]>([]);
-  const [createdDate, setCreatedDate] = useState(todayString);
+  const [ownerId, setOwnerId] = useState<number | "">("");
+  const [teamMembers, setTeamMembers] = useState<User[]>([]);
+  const [createdDate, setCreatedDate] = useState(today);
 
+  const handleOwnerChange = (newOwnerId: number) => {
+    const selectedOwner = users.find((u) => u.id === newOwnerId);
+    if (!selectedOwner) return;
+    setTeamMembers((prev) => {
+      const already = prev.some((m) => m.id === newOwnerId);
+      return already ? prev : [...prev, selectedOwner];
+    });
+    setOwnerId(newOwnerId);
+  };
+
+  const handleAddMembers = (userIds: number[]) => {
+    const toAdd = userIds
+      .map((id) => users.find((u) => u.id === id))
+      .filter((u): u is User => !!u && !teamMembers.some((m) => m.id === u.id));
+    if (toAdd.length > 0) setTeamMembers((prev) => [...prev, ...toAdd]);
+  };
+
+  const handleRemoveMember = (id: number) => {
+    if (id === ownerId) {
+      alert("Cannot remove project owner.");
+      return;
+    }
+    setTeamMembers((prev) => prev.filter((m) => m.id !== id));
+  };
 
   const handleSave = () => {
-    if (!name.trim() || selectedOwnerId === null) return;
-
+    if (!name || ownerId === "") return;
     const newProject: Project = {
       id: Date.now(),
       name,
       description,
       status,
+      ownerId,
+      teamMembers,
       userStories: [],
-      ownerId: selectedOwnerId,
-      teamMembers: selectedTeamMembers,
       createdDate: new Date(createdDate).toISOString(),
     };
-
     addProject(newProject);
     setName("");
     setDescription("");
     setStatus("Active");
-    setSelectedOwnerId(null);
-    setSelectedTeamMembers([]);
-    setCreatedDate(todayString);
+    setOwnerId("");
+    setTeamMembers([]);
+    setCreatedDate(today);
     onClose();
   };
 
+  const availableUsers = useMemo(
+    () => users.filter((u) => !teamMembers.some((m) => m.id === u.id)),
+    [users, teamMembers],
+  );
+
+  const headerColor = STATUS_HEADER[status] ?? "#2563EB";
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add New Project</DialogTitle>
-      <DialogContent>
-        <Stack spacing={3} mt={1}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          borderRadius: "16px",
+          border: `1px solid ${grey[200]}`,
+          boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
+          overflow: "hidden",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          background: headerColor,
+          px: 3,
+          py: 1.5,
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: 15,
+            color: "#fff",
+            textShadow: "0 1px 3px rgba(0,0,0,0.2)",
+          }}
+        >
+          Add Project
+        </Typography>
+      </Box>
+
+      <DialogContent sx={{ px: 3, pt: 2.5, pb: 1 }}>
+        <Box display="flex" flexDirection="column" gap={2}>
           <TextField
-            label="Project Title"
-            fullWidth
+            label="Project Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-          />
-          <TextField
-            label="Project Description"
             fullWidth
+            sx={inputSx}
+          />
+
+          <TextField
+            label="Description"
             multiline
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            fullWidth
+            sx={inputSx}
           />
-          
-          <FormControl fullWidth>
-            <InputLabel id="project-status-label">Status</InputLabel>
-            <Select
-              labelId="project-status-label"
-              value={status}
-              label="Status"
-              onChange={(e) => setStatus(e.target.value)}
-            >
-              <MenuItem value="Active">Active</MenuItem>
-              <MenuItem value="Complete">Complete</MenuItem>
-              <MenuItem value="On Hold">On Hold</MenuItem>
-            </Select>
-          </FormControl>
+
           <TextField
-            label="Created Date"
+            select
+            label="Status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            fullWidth
+            sx={inputSx}
+          >
+            {statusOptions.map((s) => (
+              <MenuItem key={s} value={s}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      bgcolor: STATUS_HEADER[s] ?? grey[400],
+                    }}
+                  />
+                  {s}
+                </Box>
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
             type="date"
+            label="Created Date"
             value={createdDate}
             onChange={(e) => setCreatedDate(e.target.value)}
-            fullWidth
             InputLabelProps={{ shrink: true }}
+            fullWidth
+            sx={inputSx}
           />
-          <FormControl fullWidth>
-            <InputLabel
-              id="owner-label"
-              sx={{ textAlign: "center", bgcolor: "white", px: 1 }}
-            >
-              Owner
-            </InputLabel>
-            <Select
-              labelId="owner-label"
-              value={selectedOwnerId ?? ""}
-              onChange={(e) => setSelectedOwnerId(Number(e.target.value))}
-            >
-              {users.map((u) => (
-                <MenuItem
-                  key={u.id}
-                  value={u.id}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    color: grey[500],
-                  }}
-                >
-                  <Typography>{u.name}</Typography>
-                  <Typography
-                    sx={{
-                      color:
-                        u.role === "Manager"
-                          ? "error.main"
-                          : u.role === "Developer"
-                            ? "primary.main"
-                            : u.role === "Tester"
-                              ? "warning.main"
-                              : "text.primary",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {u.role}
-                  </Typography>
+
+          <TextField
+            select
+            label="Owner"
+            value={ownerId}
+            onChange={(e) => handleOwnerChange(Number(e.target.value))}
+            fullWidth
+            sx={inputSx}
+          >
+            {users
+              .filter((u) => u.role === "Manager")
+              .map((u) => (
+                <MenuItem key={u.id} value={u.id}>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Avatar
+                      sx={{
+                        bgcolor: u.avatarColor,
+                        width: 22,
+                        height: 22,
+                        fontSize: 11,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {u.name[0]}
+                    </Avatar>
+                    {u.name}
+                  </Box>
                 </MenuItem>
               ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth>
-            <InputLabel id="team-members-label">Team Members</InputLabel>
-            <Select
-              labelId="team-members-label"
-              multiple
-              value={selectedTeamMembers.map((u) => String(u.id))}
-              label="Team Members"
-              onChange={(e) => {
-                const selectedIds = e.target.value as string[];
-                const selectedUsers = users.filter((user) =>
-                  selectedIds.includes(String(user.id))
-                );
-                setSelectedTeamMembers(selectedUsers);
-              }}
-              renderValue={(selected) => {
-                const ids = selected as string[];
-                return users
-                  .filter((u) => ids.includes(String(u.id)))
-                  .map((u) => u.name)
-                  .join(", ");
+          </TextField>
+
+          <Divider sx={{ borderColor: grey[100] }} />
+
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                textTransform: "uppercase",
+                color: "#94A3B8",
+                fontWeight: 700,
+                fontSize: 9.5,
+                letterSpacing: "0.4px",
               }}
             >
-              {users.map((u) => (
-                <MenuItem
-                  key={u.id}
-                  value={String(u.id)}
+              Team Members
+            </Typography>
+            <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
+              {teamMembers.map((member) => (
+                <Chip
+                  key={member.id}
+                  avatar={
+                    <Avatar sx={{ bgcolor: member.avatarColor, fontSize: 11 }}>
+                      {member.name[0]}
+                    </Avatar>
+                  }
+                  label={
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      <span style={{ fontSize: 12, fontWeight: 600 }}>
+                        {member.name}
+                      </span>
+                      <Typography
+                        component="span"
+                        sx={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: ROLE_COLORS[member.role] ?? "text.secondary",
+                        }}
+                      >
+                        {member.role}
+                      </Typography>
+                    </Box>
+                  }
+                  onDelete={
+                    member.id !== ownerId
+                      ? () => handleRemoveMember(member.id)
+                      : undefined
+                  }
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    color: grey[500],
+                    bgcolor: grey[50],
+                    border: `1px solid ${grey[200]}`,
+                    borderRadius: "8px",
+                    transition: "box-shadow 0.2s",
+                    "&:hover": { boxShadow: `0 2px 8px ${grey[300]}` },
                   }}
-                >
-                  <Typography>{u.name}</Typography>
-                  <Typography
-                    sx={{
-                      color:
-                        u.role === "Manager"
-                          ? "error.main"
-                          : u.role === "Developer"
-                            ? "primary.main"
-                            : u.role === "Tester"
-                              ? "warning.main"
-                              : "text.primary",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {u.role}
-                  </Typography>
-                </MenuItem>
+                />
               ))}
-            </Select>
-          </FormControl>
-        </Stack>
+              {teamMembers.length === 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  No team members yet.
+                </Typography>
+              )}
+            </Box>
+          </Box>
+
+          {availableUsers.length > 0 && (
+            <FormControl fullWidth sx={inputSx}>
+              <InputLabel sx={{ fontSize: 13 }}>Add Members</InputLabel>
+              <Select
+                multiple
+                value={[]}
+                label="Add Members"
+                onChange={(e) => handleAddMembers(e.target.value as number[])}
+                renderValue={() => "Select members to add"}
+                sx={{ borderRadius: "10px", fontSize: 13 }}
+              >
+                {availableUsers.map((u) => (
+                  <MenuItem key={u.id} value={u.id}>
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap={1.5}
+                      width="100%"
+                    >
+                      <Avatar
+                        sx={{
+                          bgcolor: u.avatarColor,
+                          width: 24,
+                          height: 24,
+                          fontSize: 11,
+                          fontWeight: 700,
+                        }}
+                      >
+                        {u.name[0]}
+                      </Avatar>
+                      <Typography sx={{ fontSize: 13, flex: 1 }}>
+                        {u.name}
+                      </Typography>
+                      <Chip
+                        label={u.role}
+                        size="small"
+                        sx={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          height: 20,
+                          bgcolor: `${ROLE_COLORS[u.role]}18`,
+                          color: ROLE_COLORS[u.role],
+                          border: `1px solid ${ROLE_COLORS[u.role]}40`,
+                          "& .MuiChip-label": { px: 1 },
+                        }}
+                      />
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText sx={{ fontSize: 11 }}>
+                Select one or more users to add
+              </FormHelperText>
+            </FormControl>
+          )}
+        </Box>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} variant="outlined" color="secondary">
+
+      <DialogActions
+        sx={{ px: 3, py: 2, borderTop: `1px solid ${grey[100]}`, gap: 1 }}
+      >
+        <Button
+          onClick={onClose}
+          sx={{
+            borderRadius: "8px",
+            color: grey[500],
+            fontWeight: 600,
+            fontSize: 13,
+            px: 2,
+            "&:hover": { bgcolor: grey[100] },
+          }}
+        >
           Cancel
         </Button>
-        <Button onClick={handleSave} variant="contained" color="primary">
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          sx={{
+            borderRadius: "8px",
+            fontWeight: 700,
+            fontSize: 13,
+            px: 3,
+            background: headerColor,
+            boxShadow: `0 2px 12px ${headerColor}40`,
+            "&:hover": {
+              filter: "brightness(0.9)",
+              boxShadow: `0 4px 16px ${headerColor}60`,
+            },
+          }}
+        >
           Save
         </Button>
       </DialogActions>

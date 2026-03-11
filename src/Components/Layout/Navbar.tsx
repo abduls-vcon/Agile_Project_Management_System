@@ -21,8 +21,8 @@ const Navbar: React.FC = () => {
       }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: 3 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <ViewKanbanIcon sx={{ color: "#fefefe", fontSize: 32 }} />
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <ViewKanbanIcon sx={{ color: "#fefefe", fontSize: 40 }} />
           <Typography
             variant="h6"
             fontWeight="bold"

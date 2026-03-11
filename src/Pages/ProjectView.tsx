@@ -15,8 +15,8 @@ import {
   FormControl,
   TextField,
   Grid,
-  CircularProgress,
 } from "@mui/material";
+import { BounceLoader } from "react-spinners";
 import TuneIcon from "@mui/icons-material/Tune";
 
 const inputSx = {
@@ -39,9 +39,9 @@ const ProjectView: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
+    const timer = setTimeout(() => setLoading(false), 3000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [projects, users]);
 
   if (!projects || !users) {
     return <ErrorComponent title="Something went wrong !" />;
@@ -72,7 +72,7 @@ const ProjectView: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             overflowY: "auto",
-            bgcolor: "#F8FAFC",
+            bgcolor: "#dee4ff",
           }}
         >
           <InfoBar />
@@ -82,9 +82,10 @@ const ProjectView: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               bgcolor: "#fff",
+              borderTop: "1px solid #E2E8F0",
               borderBottom: "1px solid #E2E8F0",
               px: 3,
-              py: 1.5,
+              py: 1,
               gap: 2,
               flexWrap: "wrap",
             }}
@@ -120,9 +121,7 @@ const ProjectView: React.FC = () => {
                   value={selectedUser}
                   onChange={(e) =>
                     setSelectedUser(
-                      e.target.value === "all"
-                        ? "all"
-                        : Number(e.target.value)
+                      e.target.value === "all" ? "all" : Number(e.target.value),
                     )
                   }
                   sx={inputSx}
@@ -178,17 +177,26 @@ const ProjectView: React.FC = () => {
             }}
           >
             {loading ? (
-              <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-                <CircularProgress
-                  size={70}
-                  thickness={5}
-                  sx={{ color: "#6366F1" }}
-                />
+              <Box
+                sx={{
+                  position: "fixed",
+                  top: 0,
+                  left: 0,
+                  width: "100vw",
+                  height: "100vh",
+                  bgcolor: "rgba(248,250,252,0.8)",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  zIndex: 9999,
+                }}
+              >
+                <BounceLoader color="#6366F1" size={80} />
               </Box>
             ) : (
               <Grid container spacing={3}>
                 {filteredProjects.map((project) => (
-                  <Grid sx={{ xs:12, sm:6, md:4, lg:3}} key={project.id}>
+                  <Grid key={project.id}>
                     <ProjectCard project={project} />
                   </Grid>
                 ))}

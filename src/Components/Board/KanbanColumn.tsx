@@ -48,8 +48,7 @@ const KanbanColumn: React.FC<KanbanProps> = ({ projectId, status, stories }) => 
         backdropFilter: "blur(4px)",
         display: "flex",
         flexDirection: "column",
-        overflowY: "auto",
-        height: "auto",
+        maxHeight: "calc(100vh - 160px)",
         bgcolor: statusColors[status] || "white",
         border: `1.5px solid ${cfg.border}`,
         borderRadius: "14px",
@@ -66,6 +65,7 @@ const KanbanColumn: React.FC<KanbanProps> = ({ projectId, status, stories }) => 
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          flexShrink: 0,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -100,8 +100,16 @@ const KanbanColumn: React.FC<KanbanProps> = ({ projectId, status, stories }) => 
         />
       </Box>
 
-      {/* Cards */}
-      <Box display="flex" flexDirection="column" gap={2} sx={{ p: 2 }}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        gap={2}
+        sx={{
+          p: 2,
+          overflowY: "auto",
+          flex: 1,
+        }}
+      >
         {stories.map((story) => (
           <UserStoryCard
             key={story.id}

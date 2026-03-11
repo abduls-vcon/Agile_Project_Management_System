@@ -17,7 +17,7 @@ import Diversity3Icon from "@mui/icons-material/Diversity3";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 
-type DropdownMenu = "projects" | "boards" | "users" | null;
+type DropdownMenu = "dashboard" | "projects" | "boards" | "users" | null;
 
 interface SubItem {
   label: string;
@@ -34,7 +34,15 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
+  
   {
+    key: "dashboard",
+    label: "Dashboard",
+    icon: <DashboardIcon sx={{ fontSize: 24 }} />,
+    activeColor: "#2563EB",
+    activeBg: "#DBEAFE",
+    subItems: [{ label: "Overview", path: "/" },{label: "Analytics Dashboard", path:"/analytics"}],
+  },{
     key: "projects",
     label: "Projects",
     icon: <NoteAltIcon sx={{ fontSize: 24 }} />,
@@ -72,7 +80,7 @@ const Sidebar: React.FC = () => {
   return (
     <Box
       sx={{
-        width: 260,
+        width: 250,
         height: "100vh",
         bgcolor: "#F8FAFC",
         borderRight: "1px solid #E2E8F0",

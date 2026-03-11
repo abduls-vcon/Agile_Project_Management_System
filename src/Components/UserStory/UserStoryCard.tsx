@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -6,7 +6,6 @@ import {
   Typography,
   Chip,
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Stack,
@@ -35,9 +34,14 @@ interface UserStoryProps {
 const STORY_POINT_OPTIONS = [1, 2, 3, 5, 8, 13, 21];
 
 const PRIORITY_CONFIG = {
-  High:   { bg: "#FEE2E2", color: "#991B1B", border: "#FCA5A5", dot: "#EF4444" },
-  Medium: { bg: "#FEF3C7", color: "#92400E", border: "#FCD34D", dot: "#F59E0B" },
-  Low:    { bg: "#D1FAE5", color: "#065F46", border: "#6EE7B7", dot: "#10B981" },
+  High: { bg: "#FEE2E2", color: "#991B1B", border: "#FCA5A5", dot: "#EF4444" },
+  Medium: {
+    bg: "#FEF3C7",
+    color: "#92400E",
+    border: "#FCD34D",
+    dot: "#F59E0B",
+  },
+  Low: { bg: "#D1FAE5", color: "#065F46", border: "#6EE7B7", dot: "#10B981" },
 };
 
 const inputSx = {
@@ -55,30 +59,34 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
-  const assignedUser = users.find((u) => u.id === story.assignedTo);
   const project = projects.find((p) => p.id === projectId);
   const projectMembers = project ? project.teamMembers : [];
 
-  const [title, setTitle]           = useState(story.title);
+  const [title, setTitle] = useState(story.title);
   const [description, setDescription] = useState(story.description);
-  const [priority, setPriority]     = useState<"Low" | "Medium" | "High">(story.priority);
-  const [assignedTo, setAssignedTo] = useState<number | undefined>(story.assignedTo || undefined);
-  const [storyPoints, setStoryPoints] = useState<number | undefined>(story.storyPoints);
+  const [priority, setPriority] = useState<"Low" | "Medium" | "High">(
+    story.priority,
+  );
+  const [assignedTo, setAssignedTo] = useState<number | undefined>(
+    story.assignedTo,
+  );
+  const [storyPoints, setStoryPoints] = useState<number | undefined>(
+    story.storyPoints,
+  );
 
-  useEffect(() => {
-    setTitle(story.title);
-    setDescription(story.description);
-    setPriority(story.priority as "Low" | "Medium" | "High");
-    setAssignedTo(story.assignedTo);
-    setStoryPoints(story.storyPoints);
-  }, [story]);
+  const assignedUser = users.find((u) => u.id === story.assignedTo);
 
-  const getPriorityColor = (priority: string): "error" | "warning" | "success" => {
+  const getPriorityColor = (
+    priority: string,
+  ): "error" | "warning" | "success" => {
     switch (priority) {
-      case "High":   return "error";
-      case "Medium": return "warning";
+      case "High":
+        return "error";
+      case "Medium":
+        return "warning";
       case "Low":
-      default:       return "success";
+      default:
+        return "success";
     }
   };
 
@@ -101,6 +109,16 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
     setEditOpen(false);
   };
 
+  const handleOpenEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setTitle(story.title);
+    setDescription(story.description);
+    setPriority(story.priority);
+    setAssignedTo(story.assignedTo);
+    setStoryPoints(story.storyPoints);
+    setEditOpen(true);
+  };
+
   const pCfg = PRIORITY_CONFIG[story.priority] ?? PRIORITY_CONFIG.Low;
 
   return (
@@ -111,6 +129,7 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
         onClick={() => setViewOpen(true)}
         elevation={0}
         sx={{
+          flexShrink: 0,
           position: "relative",
           bgcolor: "#fff",
           border: "1px solid",
@@ -124,8 +143,6 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
             transform: "translateY(-2px)",
           },
           mb: 1,
-          height: "auto",
-          width: "100%",
         }}
       >
         <Box
@@ -136,26 +153,36 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
         >
           {story.isBug ? (
             <PestControlIcon
-              sx={{ color: red[800], bgcolor: red[100], px: 1, py: 1, borderRadius: "50%" }}
+              sx={{
+                color: red[800],
+                bgcolor: red[100],
+                p: 1,
+                borderRadius: "50%",
+              }}
               fontSize="small"
             />
           ) : (
             <DescriptionIcon
-              sx={{ color: yellow[800], bgcolor: yellow[100], px: 1, py: 1, borderRadius: "50%" }}
+              sx={{
+                color: yellow[800],
+                bgcolor: yellow[100],
+                p: 1,
+                borderRadius: "50%",
+              }}
               fontSize="small"
             />
           )}
 
-          <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+          <Box sx={{ display: "flex", gap: 0.5 }}>
             <Tooltip title="Edit">
               <IconButton
                 size="small"
-                onClick={(e) => { e.stopPropagation(); setEditOpen(true); }}
+                onClick={handleOpenEdit}
                 sx={{
                   color: "#6366F1",
                   bgcolor: "#EEF2FF",
-                  width: 28, height: 28,
-                  "&:hover": { bgcolor: "#C7D2FE" },
+                  width: 28,
+                  height: 28,
                 }}
               >
                 <Edit fontSize="small" />
@@ -169,8 +196,8 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
                 sx={{
                   color: "#EF4444",
                   bgcolor: "#FEE2E2",
-                  width: 28, height: 28,
-                  "&:hover": { bgcolor: "#FECACA" },
+                  width: 28,
+                  height: 28,
                 }}
               >
                 <Delete fontSize="small" />
@@ -180,47 +207,48 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
         </Box>
 
         <CardContent sx={{ pt: 0 }}>
-          <Box sx={{ mt: -1 }}>
-            <Typography fontWeight={700} sx={{ fontSize: 14, color: "#1E293B" }}>
-              {story.title}
-            </Typography>
-          </Box>
-          <Divider sx={{ my: 1, borderColor: `${pCfg.dot}22` }} />
+          <Typography fontWeight={700} sx={{ fontSize: 14 }}>
+            {story.title}
+          </Typography>
 
-          <Typography variant="body2" sx={{ mt: 1, mb: 2, fontSize: 12, color: "#64748B" }}>
+          <Divider sx={{ my: 1 }} />
+
+          <Typography
+            variant="body2"
+            sx={{ fontSize: 12, color: "#64748B", mb: 2 }}
+          >
             {story.description}
           </Typography>
 
-          <Divider sx={{ my: 1, borderColor: `${pCfg.dot}22` }} />
-
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Stack direction="row" spacing={1} alignItems="center">
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Stack direction="row" spacing={1}>
               <Chip
                 label={story.priority}
                 size="small"
                 sx={{ fontSize: 10, fontWeight: "bold" }}
                 color={getPriorityColor(story.priority)}
               />
-              {story.storyPoints !== undefined && (
-                <Tooltip title="Story Points">
-                  <Chip
-                    label={`${story.storyPoints} pts`}
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      fontSize: 10,
-                      fontWeight: "bold",
-                      borderColor: "#6366F1",
-                      color: "#6366F1",
-                      bgcolor: "#EEF2FF",
-                    }}
-                  />
-                </Tooltip>
+
+              {story.storyPoints && (
+                <Chip
+                  label={`${story.storyPoints} pts`}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    fontSize: 10,
+                    borderColor: "#6366F1",
+                    color: "#6366F1",
+                  }}
+                />
               )}
             </Stack>
 
             {assignedUser ? (
-              <Avatar user={assignedUser} size={28} />
+              <Avatar user={assignedUser} size={30} />
             ) : (
               <Chip
                 label="Unassigned"
@@ -233,26 +261,65 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
         </CardContent>
       </Card>
 
-      <Dialog open={viewOpen} onClose={() => setViewOpen(false)} fullWidth maxWidth="sm">
-        <UserStoryView story={story} projectId={projectId} onClose={() => setViewOpen(false)} />
+      <Dialog
+        open={viewOpen}
+        onClose={() => setViewOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <UserStoryView
+          story={story}
+          projectId={projectId}
+          onClose={() => setViewOpen(false)}
+        />
       </Dialog>
 
-      <Dialog open={editOpen} onClose={() => setEditOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle
+      <Dialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            border: `1px solid ${grey[200]}`,
+            boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
+            overflow: "hidden",
+          },
+        }}
+      >
+        <Box
           sx={{
-            fontWeight: 700,
-            fontSize: 16,
-            bgcolor: "#EEF2FF",
-            color: "#4F46E5",
-            borderBottom: "1px solid #C7D2FE",
+            background: "#665FC9",
+            px: 3,
+            py: 1.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
           }}
         >
-          Edit User Story
-        </DialogTitle>
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: 15,
+              color: "#fff",
+              textShadow: "0 1px 3px rgba(0,0,0,0.2)",
+              flex: 1,
+            }}
+          >
+            Edit User Story
+          </Typography>
+        </Box>
 
-        <DialogContent sx={{ bgcolor: "#FAFAFA" }}>
-          <Box display="flex" flexDirection="column" gap={2} mt={1}>
-            <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth sx={inputSx} />
+        <DialogContent sx={{ px: 3, pt: 2.5, pb: 1 }}>
+          <Box display="flex" flexDirection="column" gap={2}>
+            <TextField
+              label="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              fullWidth
+              sx={inputSx}
+            />
 
             <TextField
               label="Description"
@@ -268,7 +335,7 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
               select
               label="Priority"
               value={priority}
-              onChange={(e) => setPriority(e.target.value as "Low" | "Medium" | "High")}
+              onChange={(e) => setPriority(e.target.value as any)}
               fullWidth
               sx={inputSx}
             >
@@ -281,17 +348,19 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
               select
               label="Story Points"
               value={storyPoints ?? ""}
-              onChange={(e) => {
-                const val = e.target.value;
-                setStoryPoints(val === "" ? undefined : Number(val));
-              }}
+              onChange={(e) =>
+                setStoryPoints(
+                  e.target.value ? Number(e.target.value) : undefined,
+                )
+              }
               fullWidth
-              helperText="Fibonacci-based effort estimate"
               sx={inputSx}
             >
               <MenuItem value="">None</MenuItem>
-              {STORY_POINT_OPTIONS.map((pts) => (
-                <MenuItem key={pts} value={pts}>{pts}</MenuItem>
+              {STORY_POINT_OPTIONS.map((p) => (
+                <MenuItem key={p} value={p}>
+                  {p}
+                </MenuItem>
               ))}
             </TextField>
 
@@ -299,60 +368,60 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
               select
               label="Assign To"
               value={assignedTo ?? ""}
-              onChange={(e) => setAssignedTo(e.target.value ? Number(e.target.value) : undefined)}
+              onChange={(e) =>
+                setAssignedTo(
+                  e.target.value ? Number(e.target.value) : undefined,
+                )
+              }
               fullWidth
               sx={inputSx}
             >
               <MenuItem value="">Unassigned</MenuItem>
               {projectMembers.map((user) => (
-                <MenuItem
-                  key={user.id}
-                  value={user.id}
-                  sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-                >
-                  <Typography>{user.name}</Typography>
-                  <Typography
-                    sx={{
-                      color:
-                        user.role === "Manager"   ? "error.main" :
-                        user.role === "Developer" ? "primary.main" :
-                        user.role === "Tester"    ? "warning.main" : "text.primary",
-                      fontWeight: 600,
-                      ml: 1,
-                    }}
-                  >
-                    {user.role}
-                  </Typography>
+                <MenuItem key={user.id} value={user.id}>
+                  {user.name} ({user.role})
                 </MenuItem>
               ))}
             </TextField>
           </Box>
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, py: 2, bgcolor: "#FAFAFA", borderTop: "1px solid #E2E8F0", gap: 1 }}>
+        <DialogActions
+          sx={{
+            px: 3,
+            py: 2,
+            borderTop: `1px solid ${grey[100]}`,
+            gap: 1,
+          }}
+        >
           <Button
             onClick={() => setEditOpen(false)}
             sx={{
-              borderRadius: "10px",
-              textTransform: "none",
+              borderRadius: "8px",
+              color: grey[500],
               fontWeight: 600,
-              color: "#64748B",
-              border: "1px solid #E2E8F0",
-              "&:hover": { bgcolor: "#F1F5F9" },
+              fontSize: 13,
+              px: 2,
+              "&:hover": { bgcolor: grey[100], color: grey[700] },
             }}
           >
             Cancel
           </Button>
+
           <Button
             variant="contained"
             onClick={handleSave}
             sx={{
-              borderRadius: "10px",
-              textTransform: "none",
+              borderRadius: "8px",
               fontWeight: 700,
-              bgcolor: "#4F46E5",
-              boxShadow: "none",
-              "&:hover": { bgcolor: "#4338CA", boxShadow: "none" },
+              fontSize: 13,
+              px: 3,
+              background: "#665FC9",
+              boxShadow: "0 2px 12px rgba(37,99,235,0.25)",
+              "&:hover": {
+                background: "#504a9b",
+                boxShadow: "0 4px 16px rgba(37,99,235,0.35)",
+              },
             }}
           >
             Save

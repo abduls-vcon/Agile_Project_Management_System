@@ -199,14 +199,16 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
         })}
       </Grid>
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" sx={{borderRadius:5}}>
         <DialogTitle
           sx={{
             fontWeight: 700,
             fontSize: 16,
-            bgcolor: "#EEF2FF",
-            color: "#4F46E5",
+            bgcolor: "#665fc9",
+            color: "#fff",
             borderBottom: "1px solid #C7D2FE",
+            mb:2,
+            
           }}
         >
           Edit User
@@ -269,9 +271,9 @@ const UserItems: React.FC<UserItemsProps> = ({ users }) => {
               borderRadius: "10px",
               textTransform: "none",
               fontWeight: 700,
-              bgcolor: "#4F46E5",
+              bgcolor: "#665fc9",
               boxShadow: "none",
-              "&:hover": { bgcolor: "#4338CA", boxShadow: "none" },
+              "&:hover": { bgcolor: "#665fc9", boxShadow: "none" },
             }}
           >
             Update
