@@ -31,7 +31,7 @@ const inputSx = {
 };
 
 const Board: React.FC = () => {
-  const { projects } = useApp();
+  const { projects, updateProjectStatus } = useApp();
   const [selectedProjectId, setSelectedProjectId] = useState<number>(
     projects.length > 0 ? projects[0].id : 0
   );
@@ -48,6 +48,22 @@ const Board: React.FC = () => {
     () => projects.find((p) => p.id === selectedProjectId),
     [projects, selectedProjectId]
   );
+
+  useEffect(() => {
+    if (
+      project &&
+      project.status !== "Complete" &&
+      project.userStories.length > 0
+    ) {
+      const allStoriesCompleted = project.userStories.every(
+        (story) => story.status === "Completed"
+      );
+
+      if (allStoriesCompleted && updateProjectStatus) {
+        updateProjectStatus(project.id, "Complete");
+      }
+    }
+  }, [project, updateProjectStatus]);
 
   if (!project) {
     return <ErrorComponent title="Something went wrong !" />;

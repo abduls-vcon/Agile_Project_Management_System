@@ -1,4 +1,4 @@
-import type { UserStory, Project, UserStoryStatus } from "../Models";
+import type { UserStory, Project, UserStoryStatus, Comment } from "../Models";
 
 export const addUserStory = (projects: Project[], setProjects: Function, projectId: number, story: UserStory) => {
   setProjects(
@@ -47,3 +47,27 @@ export const updateUserStoryStatus = (projects: Project[], setProjects: Function
     )
   );
 };
+
+ export const addUserStoryComment = (projects: Project[], setProjects: Function, projectId: number, storyId: number, text: string) => {
+    const newProjects = projects.map(p => {
+      if (p.id === projectId) {
+        const newStories = p.userStories.map(s => {
+          if (s.id === storyId) {
+            const newComment: Comment = {
+              id: Date.now(),
+              text,
+              timestamp: new Date().toISOString(),
+            };
+            const updatedComments = s.comments ? [...s.comments, newComment] : [newComment];
+            return { ...s, comments: updatedComments };
+          }
+          return s;
+        });
+        return { ...p, userStories: newStories };
+      }
+      return p;
+    });
+    setProjects(newProjects);
+  }
+
+

@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Box} from "@mui/material";
+import { Box } from "@mui/material";
 import Navbar from "../Components/Layout/Navbar";
 import Sidebar from "../Components/Layout/Sidebar";
 import InfoBar from "../Components/Layout/InfoBar";
@@ -35,7 +35,7 @@ const AnalyticsDashboard: React.FC = () => {
         acc[story.status] = (acc[story.status] || 0) + 1;
         return acc;
       },
-      {} as Record<UserStoryStatus, number>
+      {} as Record<UserStoryStatus, number>,
     );
 
     const statuses: UserStoryStatus[] = [
@@ -58,10 +58,8 @@ const AnalyticsDashboard: React.FC = () => {
       count: p.userStories.length,
     }));
     return {
-      xAxis: [
-        { data: data.map((d) => d.name), scaleType: "band" as const },
-      ],
-      series: [{ data: data.map((d) => d.count), label: "User Stories" }],
+      xAxis: [{ data: data.map((d) => d.name), label: "Projects" }],
+      series: [{ data: data.map((d) => d.count), label: "User Stories", color: "#6366F1"}],
     };
   }, [projects]);
 
@@ -72,7 +70,7 @@ const AnalyticsDashboard: React.FC = () => {
         acc[story.priority] = (acc[story.priority] || 0) + 1;
         return acc;
       },
-      {} as Record<Priority, number>
+      {} as Record<Priority, number>,
     );
 
     const priorities: Priority[] = ["High", "Medium", "Low"];
@@ -82,23 +80,37 @@ const AnalyticsDashboard: React.FC = () => {
       label: priority,
       value: priorityCounts[priority] || 0,
     }));
-
   }, [projects]);
 
   const projectStatusData = useMemo(() => {
-    const statusCounts = projects.reduce((acc, project) => {
-      acc[project.status] = (acc[project.status] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const statusCounts = projects.reduce(
+      (acc, project) => {
+        acc[project.status] = (acc[project.status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     const statuses = ["Active", "On Hold", "Complete"];
     return {
       xAxis: [
-        { data: statuses, scaleType: "band" as const },
+        {
+          data: statuses,
+          label: "Project Status",
+          colorMap: {
+            type: "ordinal" as const,
+            colors: ["#10B981", "#F59E0B", "#665FC9"],
+          },
+        },
       ],
-      series: [{ data: statuses.map(s => statusCounts[s] || 0), label: "Project Count" }],
+      yAxis: [{ label: "Project Count" }],
+      series: [
+        {
+          data: statuses.map((s) => statusCounts[s] || 0),
+        },
+      ],
     };
-  },[projects]);
+  }, [projects]);
 
   const pieChartBoxSx = {
     alignItems: "center",
@@ -108,7 +120,7 @@ const AnalyticsDashboard: React.FC = () => {
   };
 
   const barChartTitleSx = {
-    textAlign: "center" as const,
+    textAlign: "center",
     mb: 2,
   };
 
@@ -197,10 +209,10 @@ const AnalyticsDashboard: React.FC = () => {
                 >
                   <BarChart
                     xAxis={userStoriesPerProjectData.xAxis}
+                    yAxis={[{ label: "User Stories" }]}
                     series={userStoriesPerProjectData.series}
                     height={300}
                     width={550}
-                    colors={["#c0eac8"]}
                   />
                 </ChartCard>
                 <ChartCard
@@ -209,10 +221,10 @@ const AnalyticsDashboard: React.FC = () => {
                 >
                   <BarChart
                     xAxis={projectStatusData.xAxis}
+                    yAxis={projectStatusData.yAxis}
                     series={projectStatusData.series}
                     height={300}
                     width={500}
-                    colors={["#a2d2ff"]}
                   />
                 </ChartCard>
               </Box>

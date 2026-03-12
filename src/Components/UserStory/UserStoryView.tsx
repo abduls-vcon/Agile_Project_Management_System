@@ -1,5 +1,4 @@
 import React from "react";
-import Grid from "@mui/material/Grid";
 import {
   Card,
   CardContent,
@@ -9,13 +8,16 @@ import {
   Stack,
   Divider,
   Avatar,
+  Grid,
+  Paper
 } from "@mui/material";
 import { grey, blue, orange, green, red } from "@mui/material/colors";
 import PestControlIcon from "@mui/icons-material/PestControl";
 import DescriptionIcon from "@mui/icons-material/Description";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { useApp } from "../../Context";
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import type { UserStory } from "../../Models";
+import { useApp } from "../../Context";
 
 interface UserStoryViewProps {
   story: UserStory;
@@ -181,17 +183,17 @@ const UserStoryView: React.FC<UserStoryViewProps> = ({ story, projectId }) => {
         <Divider sx={{ mb: 1.5, borderColor: grey[100] }} />
 
         <Grid container spacing={1}>
-          <Grid sx={{ xs: 6 }}>
+          <Grid>
             <InfoBox
               label="Status"
               value={story.status}
-              bgColor={green[50]}
-              borderColor={green[200]}
-              color={green[700]}
+              bgColor={grey[50]}
+              borderColor={grey[200]}
+              color={STATUS_HEADER[story.status] ?? grey[700]}
             />
           </Grid>
 
-          <Grid sx={{ xs: 6 }}>
+          <Grid>
             <InfoBox
               label="Priority"
               value={story.priority}
@@ -201,8 +203,20 @@ const UserStoryView: React.FC<UserStoryViewProps> = ({ story, projectId }) => {
             />
           </Grid>
 
+          {story.dueDate && (
+            <Grid>
+              <InfoBox
+                label="Due Date"
+                value={new Date(story.dueDate).toLocaleDateString()}
+                bgColor={red[50]}
+                borderColor={red[200]}
+                color={red[700]}
+              />
+            </Grid>
+          )}
+
           {project && (
-            <Grid sx={{ xs: 12}}>
+            <Grid>
               <InfoBox
                 label="Project"
                 value={project.name}
@@ -233,6 +247,41 @@ const UserStoryView: React.FC<UserStoryViewProps> = ({ story, projectId }) => {
             {story.description}
           </Typography>
         )}
+
+        {story.comments && story.comments.length > 0 && (
+          <>
+            <Divider sx={{ my: 1.5, borderColor: grey[100] }} />
+            <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+              <ChatBubbleOutlineIcon sx={{ color: grey[500], fontSize: 18 }} />
+              <Typography variant="subtitle2" fontWeight={700} color={grey[600]}>
+                Comments ({story.comments.length})
+              </Typography>
+            </Stack>
+            <Stack spacing={2} mb={2} sx={{ maxHeight: 200, overflowY: 'auto', pr: 1,
+              "&::-webkit-scrollbar": { width: 6 },
+              "&::-webkit-scrollbar-thumb": { backgroundColor: "#CBD5E1", borderRadius: 3 },
+            }}>
+              {story.comments.map((comment) => (
+                <Paper
+                  key={comment.id}
+                  elevation={0}
+                  sx={{
+                    p: 1,
+                    mt: 0.5,
+                    bgcolor: grey[50],
+                    border: `1px solid ${grey[200]}`,
+                    borderRadius: 2,
+                  }}
+                >
+                  <Typography variant="body2" color={grey[800]} sx={{ fontSize: 13 }}>
+                    {comment.text}
+                  </Typography>
+                </Paper>
+              ))}
+            </Stack>
+          </>
+        )}
+        <Divider sx={{ my: 1.5, borderColor: grey[100] }} />
 
         <Stack direction="row" spacing={1} alignItems="center">
           {assignedUser ? (

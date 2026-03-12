@@ -19,5 +19,14 @@ export const useProjects = () => {
   const deleteProject = (id: number) =>
     setProjects((prev) => prev.filter((p) => p.id !== id));
 
-  return { projects, addProject, updateProject, deleteProject, setProjects };
+  const updateProjectStatus = (projectId: number, newStatus: string) => {
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === projectId ? { ...p, status: newStatus } : p
+      )
+    );
+  };
+
+
+  return { projects, addProject, updateProject, deleteProject, setProjects, updateProjectStatus };
 };

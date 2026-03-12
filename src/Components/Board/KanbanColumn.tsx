@@ -44,7 +44,7 @@ const KanbanColumn: React.FC<KanbanProps> = ({ projectId, status, stories }) => 
       onDrop={onDrop(handleDrop)}
       elevation={0}
       sx={{
-        width: 270,
+        width: 300,
         backdropFilter: "blur(4px)",
         display: "flex",
         flexDirection: "column",

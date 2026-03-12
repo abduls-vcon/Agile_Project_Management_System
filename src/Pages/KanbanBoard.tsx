@@ -35,7 +35,7 @@ const ROLE_COLORS: Record<string, { color: string; bg: string }> = {
 
 const KanbanBoard: React.FC = () => {
   const { id } = useParams();
-  const { projects } = useApp();
+  const { projects, updateProjectStatus } = useApp();
 
   const [isModalOpen, setIsModalOpen]       = useState(false);
   const [selectedPriority, setSelectedPriority] = useState<"all" | Priority>("all");
@@ -48,6 +48,22 @@ const KanbanBoard: React.FC = () => {
   }, []);
 
   const project = projects.find((p) => String(p.id) === id);
+
+  useEffect(() => {
+    if (
+      project &&
+      project.status !== "Complete" &&
+      project.userStories.length > 0
+    ) {
+      const allStoriesCompleted = project.userStories.every(
+        (story) => story.status === "Completed"
+      );
+
+      if (allStoriesCompleted && updateProjectStatus) {
+        updateProjectStatus(project.id, "Complete");
+      }
+    }
+  }, [project, updateProjectStatus]);
 
   if (!project) return <ErrorComponent title="Page Not Found" />;
 

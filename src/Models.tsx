@@ -15,7 +15,9 @@ export interface UserStory{
     priority: Priority,
     assignedTo: number | undefined,
     createdDate?:string;
+    dueDate?:string;
     storyPoints?:number,
+    comments?:Comment[]
 }
 
 
@@ -28,6 +30,13 @@ export interface Project{
     ownerId:number,
     teamMembers:User[],
     createdDate?:string,
+}
+
+
+export interface Comment{
+    id:number,
+    text:string,
+    timestamp: string,
 }
 
 export type UserStoryStatus = "Backlog" | "In Progress" | "Testing" | "Completed";

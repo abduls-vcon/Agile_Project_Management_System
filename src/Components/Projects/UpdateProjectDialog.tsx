@@ -53,9 +53,9 @@ const inputSx = {
 const UpdateProjectDialog: React.FC<Props> = ({ open, onClose, project }) => {
   const { updateProject, users } = useApp();
 
-  const [name, setName]               = useState(project.name);
-  const [status, setStatus]           = useState(project.status);
-  const [ownerId, setOwnerId]         = useState(project.ownerId);
+  const [name, setName] = useState(project.name);
+  const [status, setStatus] = useState(project.status);
+  const [ownerId, setOwnerId] = useState(project.ownerId);
   const [teamMembers, setTeamMembers] = useState<User[]>(project.teamMembers);
 
   useEffect(() => {
@@ -119,7 +119,6 @@ const UpdateProjectDialog: React.FC<Props> = ({ open, onClose, project }) => {
         },
       }}
     >
-      {/* Header — matches ProjectCard gradient bar */}
       <Box
         sx={{
           background: headerColor,

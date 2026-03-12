@@ -18,4 +18,6 @@ export interface AppContextType {
     storyId: number,
     newStatus: UserStoryStatus,
   ) => void;
+  updateProjectStatus: (projectId: number, newStatus: string) => void;
+  addUserStoryComment: (projectId: number, storyId: number, text: string) => void;
 }

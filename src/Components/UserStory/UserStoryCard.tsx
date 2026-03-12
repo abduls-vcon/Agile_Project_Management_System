@@ -19,12 +19,15 @@ import {
 import { grey, red, yellow } from "@mui/material/colors";
 import { Delete, Edit } from "@mui/icons-material";
 import PestControlIcon from "@mui/icons-material/PestControl";
+import AddCommentIcon from '@mui/icons-material/AddComment';
 import DescriptionIcon from "@mui/icons-material/Description";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { useApp } from "../../Context";
 import type { UserStory } from "../../Models";
 import { useDragDrop } from "../../Hooks/useDragDrop";
 import Avatar from "../Layout/Avatar";
 import UserStoryView from "./UserStoryView";
+import AddCommentDialog from "./AddCommentDialog";
 
 interface UserStoryProps {
   story: UserStory;
@@ -58,6 +61,7 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
 
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [commentOpen, setCommentOpen] = useState(false);
 
   const project = projects.find((p) => p.id === projectId);
   const projectMembers = project ? project.teamMembers : [];
@@ -73,6 +77,8 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
   const [storyPoints, setStoryPoints] = useState<number | undefined>(
     story.storyPoints,
   );
+  const [dueDate, setDueDate] = useState<string | undefined>(story.dueDate);
+
 
   const assignedUser = users.find((u) => u.id === story.assignedTo);
 
@@ -97,6 +103,12 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
     }
   };
 
+  const handleAddComment = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCommentOpen(true);
+  };
+
+
   const handleSave = () => {
     updateUserStory(projectId, {
       ...story,
@@ -105,6 +117,7 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
       priority,
       assignedTo: assignedTo || undefined,
       storyPoints,
+      dueDate,
     });
     setEditOpen(false);
   };
@@ -115,6 +128,7 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
     setDescription(story.description);
     setPriority(story.priority);
     setAssignedTo(story.assignedTo);
+    setDueDate(story.dueDate);
     setStoryPoints(story.storyPoints);
     setEditOpen(true);
   };
@@ -173,7 +187,7 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
             />
           )}
 
-          <Box sx={{ display: "flex", gap: 0.5 }}>
+          <Box sx={{ display: "flex", gap: 1.5 }}>
             <Tooltip title="Edit">
               <IconButton
                 size="small"
@@ -201,6 +215,21 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
                 }}
               >
                 <Delete fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Comment">
+              <IconButton
+                size="small"
+                onClick={handleAddComment}
+                sx={{
+                  color: "#b644ef",
+                  bgcolor: "#FEE2E2",
+                  width: 29,
+                  height: 29,
+                }}
+              >
+                <AddCommentIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
@@ -258,6 +287,17 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
               />
             )}
           </Stack>
+          {story.dueDate && (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: grey[600] }}>
+                <CalendarTodayIcon sx={{ fontSize: 14 }} />
+                <Typography sx={{ fontSize: 11, fontWeight: 600 }}>
+                  {new Date(story.dueDate).toLocaleDateString()}
+                </Typography>
+              </Box>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -273,6 +313,13 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
           onClose={() => setViewOpen(false)}
         />
       </Dialog>
+
+      <AddCommentDialog
+        open={commentOpen}
+        onClose={() => setCommentOpen(false)}
+        storyId={story.id}
+        projectId={projectId}
+      />
 
       <Dialog
         open={editOpen}
@@ -383,6 +430,16 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
                 </MenuItem>
               ))}
             </TextField>
+
+            <TextField
+              label="Due Date"
+              type="date"
+              value={story.dueDate ?? ""}
+              onChange={(e) => setDueDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+              sx={inputSx}
+            />
           </Box>
         </DialogContent>
 

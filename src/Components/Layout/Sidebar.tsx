@@ -13,6 +13,7 @@ import {
 
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import TableChartIcon from '@mui/icons-material/TableChart';
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
@@ -53,7 +54,7 @@ const menuItems: MenuItem[] = [
   {
     key: "boards",
     label: "Boards",
-    icon: <DashboardIcon sx={{ fontSize: 24 }} />,
+    icon: <TableChartIcon sx={{ fontSize: 24 }} />,
     activeColor: "#059669",
     activeBg: "#D1FAE5",
     subItems: [{ label: "View Boards", path: "/boards" }],

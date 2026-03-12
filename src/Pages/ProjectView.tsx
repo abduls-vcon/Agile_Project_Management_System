@@ -15,9 +15,12 @@ import {
   FormControl,
   TextField,
   Grid,
+  Typography,
 } from "@mui/material";
 import { BounceLoader } from "react-spinners";
 import TuneIcon from "@mui/icons-material/Tune";
+import Avatar from "../Components/Layout/Avatar";
+import { grey } from "@mui/material/colors";
 
 const inputSx = {
   "& .MuiOutlinedInput-root": {
@@ -125,13 +128,17 @@ const ProjectView: React.FC = () => {
                     )
                   }
                   sx={inputSx}
-                >
-                  <MenuItem value="all">All Users</MenuItem>
 
-                  {users.map((user) => (
-                    <MenuItem key={user.id} value={user.id}>
-                      {user.name}
-                    </MenuItem>
+                >
+                  <MenuItem value="all" sx={{color:grey[700]}}>All Owners</MenuItem>
+
+                  {users
+                    .filter((user) => user.role === "Manager")
+                    .map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        <Typography sx={{ flexGrow: 1 }}>{user.name}</Typography>
+                        <Avatar user={user} size={25} />
+                      </MenuItem>
                   ))}
                 </TextField>
               </FormControl>
