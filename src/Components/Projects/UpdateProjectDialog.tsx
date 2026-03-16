@@ -185,7 +185,7 @@ const UpdateProjectDialog: React.FC<Props> = ({ open, onClose, project }) => {
             sx={inputSx}
           >
             {users
-              .filter((u) => u.role === "Manager")
+              .filter((u) => u.role === "Manager" || u.role === "Admin")
               .map((u) => (
                 <MenuItem key={u.id} value={u.id}>
                   <Box display="flex" alignItems="center" gap={1}>

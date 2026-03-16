@@ -25,7 +25,7 @@ const UserView: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<"all" | string>("all");
   const [loading, setLoading] = useState(true);
 
-  const { users } = useApp();
+  const { users, currentUser } = useApp();
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 3000);
@@ -95,6 +95,7 @@ const UserView: React.FC = () => {
                 gap: 2,
                 flexWrap: "wrap",
                 alignItems: "center",
+                mt: { xs: 2, md: 0 },
               }}
             >
               <TextField
@@ -140,7 +141,7 @@ const UserView: React.FC = () => {
                 </TextField>
               </FormControl>
 
-              <Button
+              {currentUser?.role === "Admin" && <Button
                 sx={{
                   bgcolor: "#EEF2FF",
                   color: "#4F46E5",
@@ -156,7 +157,7 @@ const UserView: React.FC = () => {
                 onClick={() => setOpenDialog(true)}
               >
                 Add User
-              </Button>
+              </Button>}
 
               <AddUser open={openDialog} onClose={() => setOpenDialog(false)} />
             </Box>

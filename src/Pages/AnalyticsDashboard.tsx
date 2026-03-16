@@ -201,12 +201,15 @@ const AnalyticsDashboard: React.FC = () => {
                   display: "flex",
                   width: "100%",
                   justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: 3
                 }}
               >
                 <ChartCard
                   title="User Stories Per Project"
                   titleSx={barChartTitleSx}
                 >
+                  <Box sx={{ overflowX: "auto", maxWidth: "100%", display: "flex", justifyContent: "center" }}>
                   <BarChart
                     xAxis={userStoriesPerProjectData.xAxis}
                     yAxis={[{ label: "User Stories" }]}
@@ -214,11 +217,13 @@ const AnalyticsDashboard: React.FC = () => {
                     height={300}
                     width={550}
                   />
+                  </Box>
                 </ChartCard>
                 <ChartCard
                   title="Project Status Distribution"
                   titleSx={barChartTitleSx}
                 >
+                  <Box sx={{ overflowX: "auto", maxWidth: "100%", display: "flex", justifyContent: "center" }}>
                   <BarChart
                     xAxis={projectStatusData.xAxis}
                     yAxis={projectStatusData.yAxis}
@@ -226,6 +231,7 @@ const AnalyticsDashboard: React.FC = () => {
                     height={300}
                     width={500}
                   />
+                  </Box>
                 </ChartCard>
               </Box>
             </>

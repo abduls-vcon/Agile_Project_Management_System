@@ -10,7 +10,7 @@ interface InfoCardProps {
 
 const InfoCard: React.FC<InfoCardProps> = ({ color, icon, total, title }) => {
   return (
-    <Grid sx={{xs:12, sm:6, md:4, lg:2}}>
+    <Grid sx={{xs:12, sm:6, md:4, lg:2, mx:1,}}>
       <Paper
         sx={{
           m: 1,
@@ -22,8 +22,8 @@ const InfoCard: React.FC<InfoCardProps> = ({ color, icon, total, title }) => {
           borderRadius: 3,
           bgcolor: color,
           color: "#fff",
-          height: 120,
-          width: 120,
+          minHeight: "120px",
+          width: "120px",
           transition: "transform 0.3s, box-shadow 0.3s",
           "&:hover": { transform: "translateY(-5px)", boxShadow: 8 },
         }}

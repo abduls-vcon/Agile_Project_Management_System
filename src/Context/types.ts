@@ -1,10 +1,16 @@
-import type { User,Project,UserStory, UserStoryStatus } from "../Models";
+import type { User,Project,UserStory, UserStoryStatus, Admin } from "../Models";
 
 
 export interface AppContextType {
+  admin: Admin | null;
+  currentUser: User | null;
+  setAdmin: (admin: Admin | null) => void;
+  setCurrentUser: (user: User | null) => void;
+  logout: () => void
   users: User[];
   projects: Project[];
-  addUser: (u: Omit<User, "avatarColor">) => void;
+  addAdmin: (adminData: Omit<Admin, "id">) => Admin;
+  addUser: (u: Omit<User, "avatarColor" | "password">, password: string) => void;
   updateUser: (updatedUser: User) => void;
   deleteUser: (id: number) => void;
   addProject: (p: Project) => void;

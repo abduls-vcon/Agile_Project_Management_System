@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Box,
   Card,
@@ -19,12 +19,14 @@ import {
 import { grey, red, yellow } from "@mui/material/colors";
 import { Delete, Edit } from "@mui/icons-material";
 import PestControlIcon from "@mui/icons-material/PestControl";
-import AddCommentIcon from '@mui/icons-material/AddComment';
+import AddCommentIcon from "@mui/icons-material/AddComment";
 import DescriptionIcon from "@mui/icons-material/Description";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+
 import { useApp } from "../../Context";
 import type { UserStory } from "../../Models";
 import { useDragDrop } from "../../Hooks/useDragDrop";
+
 import Avatar from "../Layout/Avatar";
 import UserStoryView from "./UserStoryView";
 import AddCommentDialog from "./AddCommentDialog";
@@ -37,103 +39,96 @@ interface UserStoryProps {
 const STORY_POINT_OPTIONS = [1, 2, 3, 5, 8, 13, 21];
 
 const PRIORITY_CONFIG = {
-  High: { bg: "#FEE2E2", color: "#991B1B", border: "#FCA5A5", dot: "#EF4444" },
-  Medium: {
-    bg: "#FEF3C7",
-    color: "#92400E",
-    border: "#FCD34D",
-    dot: "#F59E0B",
-  },
-  Low: { bg: "#D1FAE5", color: "#065F46", border: "#6EE7B7", dot: "#10B981" },
-};
-
-const inputSx = {
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
-    "&.Mui-focused fieldset": { borderColor: "#6366F1" },
-  },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#6366F1" },
+  High: { dot: "#EF4444" },
+  Medium: { dot: "#F59E0B" },
+  Low: { dot: "#10B981" },
 };
 
 const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
-  const { users, projects, deleteUserStory, updateUserStory } = useApp();
+  const { users, projects, deleteUserStory, updateUserStory, currentUser } =
+    useApp();
+
   const { onDragStart } = useDragDrop();
 
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [commentOpen, setCommentOpen] = useState(false);
 
-  const project = projects.find((p) => p.id === projectId);
-  const projectMembers = project ? project.teamMembers : [];
-
   const [title, setTitle] = useState(story.title);
   const [description, setDescription] = useState(story.description);
-  const [priority, setPriority] = useState<"Low" | "Medium" | "High">(
-    story.priority,
-  );
+  const [priority, setPriority] = useState(story.priority);
   const [assignedTo, setAssignedTo] = useState<number | undefined>(
-    story.assignedTo,
+    story.assignedTo
   );
   const [storyPoints, setStoryPoints] = useState<number | undefined>(
-    story.storyPoints,
+    story.storyPoints
   );
   const [dueDate, setDueDate] = useState<string | undefined>(story.dueDate);
 
+  const project = useMemo(
+    () => projects.find((p) => p.id === projectId),
+    [projects, projectId]
+  );
 
-  const assignedUser = users.find((u) => u.id === story.assignedTo);
+  const projectMembers = project?.teamMembers ?? [];
 
-  const getPriorityColor = (
-    priority: string,
-  ): "error" | "warning" | "success" => {
-    switch (priority) {
-      case "High":
-        return "error";
-      case "Medium":
-        return "warning";
-      case "Low":
-      default:
-        return "success";
-    }
-  };
+  const assignedUser = useMemo(
+    () => users.find((u) => u.id === story.assignedTo),
+    [users, story.assignedTo]
+  );
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (window.confirm("Are you sure you want to delete this story?")) {
-      deleteUserStory(projectId, story.id);
-    }
-  };
+  const pCfg = PRIORITY_CONFIG[story.priority] ?? PRIORITY_CONFIG.Low;
 
-  const handleAddComment = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCommentOpen(true);
-  };
+  const handleDelete = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
 
+      if (window.confirm("Are you sure you want to delete this story?")) {
+        deleteUserStory(projectId, story.id);
+      }
+    },
+    [deleteUserStory, projectId, story.id]
+  );
 
-  const handleSave = () => {
+  const handleOpenEdit = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      setTitle(story.title);
+      setDescription(story.description);
+      setPriority(story.priority);
+      setAssignedTo(story.assignedTo);
+      setStoryPoints(story.storyPoints);
+      setDueDate(story.dueDate);
+
+      setEditOpen(true);
+    },
+    [story]
+  );
+
+  const handleSave = useCallback(() => {
     updateUserStory(projectId, {
       ...story,
       title,
       description,
       priority,
-      assignedTo: assignedTo || undefined,
+      assignedTo,
       storyPoints,
       dueDate,
     });
+
     setEditOpen(false);
-  };
-
-  const handleOpenEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setTitle(story.title);
-    setDescription(story.description);
-    setPriority(story.priority);
-    setAssignedTo(story.assignedTo);
-    setDueDate(story.dueDate);
-    setStoryPoints(story.storyPoints);
-    setEditOpen(true);
-  };
-
-  const pCfg = PRIORITY_CONFIG[story.priority] ?? PRIORITY_CONFIG.Low;
+  }, [
+    updateUserStory,
+    projectId,
+    story,
+    title,
+    description,
+    priority,
+    assignedTo,
+    storyPoints,
+    dueDate,
+  ]);
 
   return (
     <>
@@ -143,14 +138,11 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
         onClick={() => setViewOpen(true)}
         elevation={0}
         sx={{
-          flexShrink: 0,
-          position: "relative",
-          bgcolor: "#fff",
           border: "1px solid",
           borderColor: grey[200],
           borderLeft: `4px solid ${pCfg.dot}`,
-          cursor: "pointer",
           borderRadius: 3,
+          cursor: "pointer",
           transition: "0.2s",
           "&:hover": {
             boxShadow: `0 4px 16px ${pCfg.dot}33`,
@@ -188,46 +180,38 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
           )}
 
           <Box sx={{ display: "flex", gap: 1.5 }}>
-            <Tooltip title="Edit">
-              <IconButton
-                size="small"
-                onClick={handleOpenEdit}
-                sx={{
-                  color: "#6366F1",
-                  bgcolor: "#EEF2FF",
-                  width: 28,
-                  height: 28,
-                }}
-              >
-                <Edit fontSize="small" />
-              </IconButton>
-            </Tooltip>
+            {currentUser?.role === "Manager" && (
+              <>
+                <Tooltip title="Edit">
+                  <IconButton
+                    size="small"
+                    onClick={handleOpenEdit}
+                    sx={{ color: "#6366F1", bgcolor: "#EEF2FF" }}
+                  >
+                    <Edit fontSize="small" />
+                  </IconButton>
+                </Tooltip>
 
-            <Tooltip title="Delete">
-              <IconButton
-                size="small"
-                onClick={handleDelete}
-                sx={{
-                  color: "#EF4444",
-                  bgcolor: "#FEE2E2",
-                  width: 28,
-                  height: 28,
-                }}
-              >
-                <Delete fontSize="small" />
-              </IconButton>
-            </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton
+                    size="small"
+                    onClick={handleDelete}
+                    sx={{ color: "#EF4444", bgcolor: "#FEE2E2" }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
 
             <Tooltip title="Comment">
               <IconButton
                 size="small"
-                onClick={handleAddComment}
-                sx={{
-                  color: "#b644ef",
-                  bgcolor: "#FEE2E2",
-                  width: 29,
-                  height: 29,
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCommentOpen(true);
                 }}
+                sx={{ color: "#b644ef", bgcolor: "#F3E8FF" }}
               >
                 <AddCommentIcon fontSize="small" />
               </IconButton>
@@ -242,36 +226,19 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
 
           <Divider sx={{ my: 1 }} />
 
-          <Typography
-            variant="body2"
-            sx={{ fontSize: 12, color: "#64748B", mb: 2 }}
-          >
+          <Typography sx={{ fontSize: 12, color: "#64748B", mb: 2 }}>
             {story.description}
           </Typography>
 
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
+          <Stack direction="row" justifyContent="space-between">
             <Stack direction="row" spacing={1}>
-              <Chip
-                label={story.priority}
-                size="small"
-                sx={{ fontSize: 10, fontWeight: "bold" }}
-                color={getPriorityColor(story.priority)}
-              />
+              <Chip label={story.priority} size="small" />
 
               {story.storyPoints && (
                 <Chip
                   label={`${story.storyPoints} pts`}
                   size="small"
                   variant="outlined"
-                  sx={{
-                    fontSize: 10,
-                    borderColor: "#6366F1",
-                    color: "#6366F1",
-                  }}
                 />
               )}
             </Stack>
@@ -279,20 +246,16 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
             {assignedUser ? (
               <Avatar user={assignedUser} size={30} />
             ) : (
-              <Chip
-                label="Unassigned"
-                size="small"
-                variant="outlined"
-                sx={{ fontSize: 10, borderColor: grey[300], color: grey[500] }}
-              />
+              <Chip label="Unassigned" size="small" variant="outlined" />
             )}
           </Stack>
+
           {story.dueDate && (
             <>
               <Divider sx={{ my: 1 }} />
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: grey[600] }}>
+              <Box display="flex" alignItems="center" gap={0.5}>
                 <CalendarTodayIcon sx={{ fontSize: 14 }} />
-                <Typography sx={{ fontSize: 11, fontWeight: 600 }}>
+                <Typography sx={{ fontSize: 11 }}>
                   {new Date(story.dueDate).toLocaleDateString()}
                 </Typography>
               </Box>
@@ -301,12 +264,8 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
         </CardContent>
       </Card>
 
-      <Dialog
-        open={viewOpen}
-        onClose={() => setViewOpen(false)}
-        fullWidth
-        maxWidth="sm"
-      >
+      {/* View Dialog */}
+      <Dialog open={viewOpen} onClose={() => setViewOpen(false)} fullWidth>
         <UserStoryView
           story={story}
           projectId={projectId}
@@ -320,71 +279,39 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
         storyId={story.id}
         projectId={projectId}
       />
-
-      <Dialog
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        fullWidth
-        maxWidth="sm"
-        PaperProps={{
-          sx: {
-            borderRadius: "16px",
-            border: `1px solid ${grey[200]}`,
-            boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
-            overflow: "hidden",
-          },
-        }}
-      >
-        <Box
-          sx={{
-            background: "#665FC9",
-            px: 3,
-            py: 1.5,
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <Typography
-            sx={{
-              fontWeight: 700,
-              fontSize: 15,
-              color: "#fff",
-              textShadow: "0 1px 3px rgba(0,0,0,0.2)",
-              flex: 1,
-            }}
-          >
+      <Dialog open={editOpen} onClose={() => setEditOpen(false)} fullWidth>
+        <Box sx={{ p: 2, bgcolor: "#665FC9" }}>
+          <Typography sx={{ color: "#fff", fontWeight: 700 }}>
             Edit User Story
           </Typography>
         </Box>
 
-        <DialogContent sx={{ px: 3, pt: 2.5, pb: 1 }}>
-          <Box display="flex" flexDirection="column" gap={2}>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
               label="Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               fullWidth
-              sx={inputSx}
             />
 
             <TextField
               label="Description"
               multiline
-              rows={4}
+              rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               fullWidth
-              sx={inputSx}
             />
 
             <TextField
               select
               label="Priority"
               value={priority}
-              onChange={(e) => setPriority(e.target.value as any)}
+              onChange={(e) =>
+                setPriority(e.target.value as "Low" | "Medium" | "High")
+              }
               fullWidth
-              sx={inputSx}
             >
               <MenuItem value="High">High</MenuItem>
               <MenuItem value="Medium">Medium</MenuItem>
@@ -397,13 +324,13 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
               value={storyPoints ?? ""}
               onChange={(e) =>
                 setStoryPoints(
-                  e.target.value ? Number(e.target.value) : undefined,
+                  e.target.value ? Number(e.target.value) : undefined
                 )
               }
               fullWidth
-              sx={inputSx}
             >
               <MenuItem value="">None</MenuItem>
+
               {STORY_POINT_OPTIONS.map((p) => (
                 <MenuItem key={p} value={p}>
                   {p}
@@ -417,13 +344,13 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
               value={assignedTo ?? ""}
               onChange={(e) =>
                 setAssignedTo(
-                  e.target.value ? Number(e.target.value) : undefined,
+                  e.target.value ? Number(e.target.value) : undefined
                 )
               }
               fullWidth
-              sx={inputSx}
             >
               <MenuItem value="">Unassigned</MenuItem>
+
               {projectMembers.map((user) => (
                 <MenuItem key={user.id} value={user.id}>
                   {user.name} ({user.role})
@@ -434,52 +361,21 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
             <TextField
               label="Due Date"
               type="date"
-              value={story.dueDate ?? ""}
+              value={dueDate ?? ""}
               onChange={(e) => setDueDate(e.target.value)}
               InputLabelProps={{ shrink: true }}
               fullWidth
-              sx={inputSx}
             />
-          </Box>
+          </Stack>
         </DialogContent>
 
-        <DialogActions
-          sx={{
-            px: 3,
-            py: 2,
-            borderTop: `1px solid ${grey[100]}`,
-            gap: 1,
-          }}
-        >
-          <Button
-            onClick={() => setEditOpen(false)}
-            sx={{
-              borderRadius: "8px",
-              color: grey[500],
-              fontWeight: 600,
-              fontSize: 13,
-              px: 2,
-              "&:hover": { bgcolor: grey[100], color: grey[700] },
-            }}
-          >
-            Cancel
-          </Button>
+        <DialogActions>
+          <Button onClick={() => setEditOpen(false)}>Cancel</Button>
 
           <Button
             variant="contained"
             onClick={handleSave}
-            sx={{
-              borderRadius: "8px",
-              fontWeight: 700,
-              fontSize: 13,
-              px: 3,
-              background: "#665FC9",
-              boxShadow: "0 2px 12px rgba(37,99,235,0.25)",
-              "&:hover": {
-                background: "#504a9b",
-                boxShadow: "0 4px 16px rgba(37,99,235,0.35)",
-              },
-            }}
+            sx={{ bgcolor: "#665FC9" }}
           >
             Save
           </Button>
@@ -489,4 +385,4 @@ const UserStoryCard: React.FC<UserStoryProps> = ({ story, projectId }) => {
   );
 };
 
-export default UserStoryCard;
+export default React.memo(UserStoryCard);

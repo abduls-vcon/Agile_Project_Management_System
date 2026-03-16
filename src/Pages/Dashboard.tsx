@@ -98,7 +98,7 @@ const Dashboard: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             overflowY: "auto",
-            p: 3,
+            p: { xs: 2, md: 3 },
           }}
         >
           <InfoBar />
@@ -123,7 +123,8 @@ const Dashboard: React.FC = () => {
             <>
               <Grid
                 container
-                spacing={7}
+                spacing={{ xs:2, sm: 2,md: 3, lg: 4 }}
+                columns={{ xs: 12, sm: 12, md: 12, lg: 10 }}
                 sx={{ display: "flex", justifyContent: "center", pt: 3 }}
               >
                 {dashboardCards.map((card) => (
@@ -144,10 +145,12 @@ const Dashboard: React.FC = () => {
                     borderRadius: 3,
                     border: `1px solid ${grey[200]}`,
                     boxShadow: 4,
-                    height: 120,
+                    minHeight: 120,
                     display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
                     alignItems: "center",
                     px: 2,
+                    py: { xs: 2, sm: 0 },
                     transition: "all 0.3s",
                     "&:hover": { boxShadow: 8 },
                   }}
@@ -155,7 +158,7 @@ const Dashboard: React.FC = () => {
                   <Typography
                     variant="h6"
                     fontWeight={900}
-                    sx={{ mr: 3, color: "#665fc9", whiteSpace: "nowrap" }}
+                    sx={{ mr: { xs: 0, sm: 3 }, mb: { xs: 1, sm: 0 }, color: "#665fc9", whiteSpace: "nowrap" }}
                   >
                     Project Updates:
                   </Typography>

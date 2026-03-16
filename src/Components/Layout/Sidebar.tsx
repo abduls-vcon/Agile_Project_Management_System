@@ -17,6 +17,7 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { useApp } from "../../Context";
 
 type DropdownMenu = "dashboard" | "projects" | "boards" | "users" | null;
 
@@ -34,45 +35,50 @@ interface MenuItem {
   subItems: SubItem[];
 }
 
-const menuItems: MenuItem[] = [
-  
-  {
-    key: "dashboard",
-    label: "Dashboard",
-    icon: <DashboardIcon sx={{ fontSize: 24 }} />,
-    activeColor: "#2563EB",
-    activeBg: "#DBEAFE",
-    subItems: [{ label: "Overview", path: "/" },{label: "Analytics Dashboard", path:"/analytics"}],
-  },{
-    key: "projects",
-    label: "Projects",
-    icon: <NoteAltIcon sx={{ fontSize: 24 }} />,
-    activeColor: "#4F46E5",
-    activeBg: "#EEF2FF",
-    subItems: [{ label: "View Projects", path: "/projects" }],
-  },
-  {
-    key: "boards",
-    label: "Boards",
-    icon: <TableChartIcon sx={{ fontSize: 24 }} />,
-    activeColor: "#059669",
-    activeBg: "#D1FAE5",
-    subItems: [{ label: "View Boards", path: "/boards" }],
-  },
-  {
-    key: "users",
-    label: "Users",
-    icon: <Diversity3Icon sx={{ fontSize: 24 }} />,
-    activeColor: "#D97706",
-    activeBg: "#FEF3C7",
-    subItems: [{ label: "View Users", path: "/users" }],
-  },
-];
-
 const Sidebar: React.FC = () => {
   const [openDropdown, setOpenDropdown] = useState<DropdownMenu>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { admin } = useApp();
+  const id = admin?.id;
+
+  const menuItems: MenuItem[] = [
+    {
+      key: "dashboard",
+      label: "Dashboard",
+      icon: <DashboardIcon sx={{ fontSize: 24 }} />,
+      activeColor: "#2563EB",
+      activeBg: "#DBEAFE",
+      subItems: [
+        { label: "Overview", path: `/dashboard/${id}` },
+        { label: "Analytics Dashboard", path: `/analytics/${id}` },
+      ],
+    },
+    {
+      key: "projects",
+      label: "Projects",
+      icon: <NoteAltIcon sx={{ fontSize: 24 }} />,
+      activeColor: "#4F46E5",
+      activeBg: "#EEF2FF",
+      subItems: [{ label: "View Projects", path: `/projects/${id}` }],
+    },
+    {
+      key: "boards",
+      label: "Boards",
+      icon: <TableChartIcon sx={{ fontSize: 24 }} />,
+      activeColor: "#059669",
+      activeBg: "#D1FAE5",
+      subItems: [{ label: "View Boards", path: `/boards/${id}` }],
+    },
+    {
+      key: "users",
+      label: "Users",
+      icon: <Diversity3Icon sx={{ fontSize: 24 }} />,
+      activeColor: "#D97706",
+      activeBg: "#FEF3C7",
+      subItems: [{ label: "View Users", path: `/users/${id}` }],
+    },
+  ];
 
   const toggleDropdown = (menu: DropdownMenu) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
@@ -87,6 +93,7 @@ const Sidebar: React.FC = () => {
         borderRight: "1px solid #E2E8F0",
         pt: 2,
         overflowY: "auto",
+        display: { xs: "none", md: "block" },
         "&::-webkit-scrollbar": { width: 6 },
         "&::-webkit-scrollbar-thumb": { backgroundColor: "#CBD5E1", borderRadius: 3 },
       }}

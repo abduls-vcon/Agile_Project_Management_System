@@ -33,7 +33,7 @@ const inputSx = {
 };
 
 const ProjectView: React.FC = () => {
-  const { users, projects } = useApp();
+  const { users, projects, currentUser } = useApp();
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [status, setStatus] = useState<string>("All");
@@ -99,6 +99,7 @@ const ProjectView: React.FC = () => {
                 gap: 2,
                 flexWrap: "wrap",
                 alignItems: "center",
+                width: "100%",
               }}
             >
               <TuneIcon sx={{ color: "#6366F1", fontSize: 20 }} />
@@ -154,7 +155,7 @@ const ProjectView: React.FC = () => {
               />
             </Box>
 
-            <Button
+            {currentUser?.role === "Admin" && <Button
               onClick={() => setOpenDialog(true)}
               sx={{
                 bgcolor: "#EEF2FF",
@@ -170,7 +171,7 @@ const ProjectView: React.FC = () => {
               }}
             >
               Add Project
-            </Button>
+            </Button>}
 
             <AddProject
               open={openDialog}

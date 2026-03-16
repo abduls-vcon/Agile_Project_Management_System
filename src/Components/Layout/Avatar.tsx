@@ -14,7 +14,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, size }) => {
         bgcolor: user.avatarColor,
         width: size,
         height: size,
-        fontWeight: 600,
+        fontWeight:900,
       }}
     >
       {user.name.charAt(0)}

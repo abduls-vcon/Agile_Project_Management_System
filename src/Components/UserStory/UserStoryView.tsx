@@ -7,7 +7,7 @@ import {
   Chip,
   Stack,
   Divider,
-  Avatar,
+  Avatar as MuiAvatar,
   Grid,
   Paper
 } from "@mui/material";
@@ -17,6 +17,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import type { UserStory } from "../../Models";
+import Avatar from "../Layout/Avatar";
 import { useApp } from "../../Context";
 
 interface UserStoryViewProps {
@@ -85,6 +86,13 @@ const STATUS_HEADER: Record<string, string> = {
   "In Progress": "#2563EB",
   "Testing":     "#D97706",
   "Completed":   "#059669",
+};
+
+const ROLE_COLORS: Record<string, string> = {
+  Admin: "#665fc9",
+  Manager: "#ef4444",
+  Developer: "#3b82f6",
+  Tester: "#f59e0b",
 };
 
 const UserStoryView: React.FC<UserStoryViewProps> = ({ story, projectId }) => {
@@ -261,23 +269,53 @@ const UserStoryView: React.FC<UserStoryViewProps> = ({ story, projectId }) => {
               "&::-webkit-scrollbar": { width: 6 },
               "&::-webkit-scrollbar-thumb": { backgroundColor: "#CBD5E1", borderRadius: 3 },
             }}>
-              {story.comments.map((comment) => (
-                <Paper
-                  key={comment.id}
-                  elevation={0}
-                  sx={{
-                    p: 1,
-                    mt: 0.5,
-                    bgcolor: grey[50],
-                    border: `1px solid ${grey[200]}`,
-                    borderRadius: 2,
-                  }}
-                >
-                  <Typography variant="body2" color={grey[800]} sx={{ fontSize: 13 }}>
-                    {comment.text}
-                  </Typography>
-                </Paper>
-              ))}
+              {story.comments.map((comment) => {
+                const commentUser = users.find((u) => u.id === comment.userId);
+                const roleColor = commentUser ? ROLE_COLORS[commentUser.role] || grey[500] : grey[500];
+
+                return (
+                  <Stack key={comment.id} direction="row" spacing={1.5}>
+                    {commentUser ? (
+                      <Avatar user={commentUser} size={32} />
+                    ) : (
+                      <MuiAvatar sx={{ width: 32, height: 32 }} />
+                    )}
+                    <Box sx={{ flex: 1 }}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          p: 1.5,
+                          bgcolor: grey[50],
+                          border: `1px solid ${grey[200]}`,
+                          borderRadius: 2,
+                        }}
+                      >
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={0.5}>
+                          <Typography variant="body2" fontWeight={700} color={grey[800]} sx={{ fontSize: 13 }}>
+                            {commentUser ? commentUser.name : "Unknown User"}
+                          </Typography>
+                          {commentUser && (
+                            <Chip
+                              label={commentUser.role}
+                              size="small"
+                              sx={{
+                                height: 18,
+                                fontSize: 10,
+                                fontWeight: 700,
+                                bgcolor: `${roleColor}18`,
+                                color: roleColor,
+                              }}
+                            />
+                          )}
+                        </Stack>
+                        <Typography variant="body2" color={grey[700]} sx={{ fontSize: 13, lineHeight: 1.6 }}>
+                          {comment.text}
+                        </Typography>
+                      </Paper>
+                    </Box>
+                  </Stack>
+                );
+              })}
             </Stack>
           </>
         )}
@@ -286,7 +324,7 @@ const UserStoryView: React.FC<UserStoryViewProps> = ({ story, projectId }) => {
         <Stack direction="row" spacing={1} alignItems="center">
           {assignedUser ? (
             <>
-              <Avatar
+              <MuiAvatar
                 sx={{
                   bgcolor: assignedUser.avatarColor,
                   width: 22,
@@ -298,7 +336,7 @@ const UserStoryView: React.FC<UserStoryViewProps> = ({ story, projectId }) => {
                 }}
               >
                 {assignedUser.name.charAt(0).toUpperCase()}
-              </Avatar>
+              </MuiAvatar>
               <Typography variant="caption" fontWeight={500} color={grey[500]}>
                 {assignedUser.name}
               </Typography>

@@ -1,8 +1,26 @@
+export interface Admin{
+    id:number,
+    companyName: string,
+    address: {
+        street:string,
+        city:string,
+        state:string,
+        country:string
+    },
+    industry:string,
+    users: User[],
+    projects: Project[]
+}
+
+
+
 export interface User{
     id: number,
     name:string,
+    email: string;
     role: Role,
-    avatarColor?:string
+    avatarColor?:string,
+    password?: string; // NOTE: In a real app, this would never be stored in plaintext
 }
 
 
@@ -37,8 +55,9 @@ export interface Comment{
     id:number,
     text:string,
     timestamp: string,
+    userId: number,
 }
 
 export type UserStoryStatus = "Backlog" | "In Progress" | "Testing" | "Completed";
-export type Role = "Developer" | "Tester" | "Manager";
+export type Role = "Admin" | "Manager" | "Developer" | "Tester";
 export type Priority = "Low" | "Medium" | "High";

@@ -35,7 +35,7 @@ const ROLE_COLORS: Record<string, { color: string; bg: string }> = {
 
 const KanbanBoard: React.FC = () => {
   const { id } = useParams();
-  const { projects, updateProjectStatus } = useApp();
+  const { projects, updateProjectStatus, currentUser } = useApp();
 
   const [isModalOpen, setIsModalOpen]       = useState(false);
   const [selectedPriority, setSelectedPriority] = useState<"all" | Priority>("all");
@@ -226,7 +226,7 @@ const KanbanBoard: React.FC = () => {
               {project.name} Board
             </Typography>
 
-            <Button
+            {["Manager", "Tester"].includes(currentUser?.role || "") && <Button
               startIcon={<AddIcon />}
               onClick={() => setIsModalOpen(true)}
               sx={{
@@ -243,7 +243,7 @@ const KanbanBoard: React.FC = () => {
               }}
             >
               Add Story
-            </Button>
+            </Button>}
           </Box>
 
           {isModalOpen && (
@@ -278,7 +278,10 @@ const KanbanBoard: React.FC = () => {
                 gap: 2,
                 px: 3,
                 py: 2,
-                overflowX: "auto"
+                overflowX: "auto",
+                "@media (max-width: 800px)": {
+                  flexDirection: "column",
+                },
               }}
             >
               {STATUSES.map((status) => (

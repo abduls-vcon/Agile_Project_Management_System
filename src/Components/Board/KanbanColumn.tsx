@@ -54,6 +54,12 @@ const KanbanColumn: React.FC<KanbanProps> = ({ projectId, status, stories }) => 
         borderRadius: "14px",
         overflow: "hidden",
         boxShadow: `0 2px 12px ${cfg.dot}22`,
+        "@media (max-width: 800px)": {
+                  flexDirection: "column",
+                  width: "100%",
+                  height: "100%",
+                  minHeight: "300px"
+                },
       }}
     >
       <Box

@@ -4,22 +4,27 @@ import BusinessIcon from "@mui/icons-material/Business";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 import useDateAndTime from "../../Hooks/useDateAndTime";
+import { useApp } from "../../Context";
 
 const InfoBar: React.FC = () => {
   const clock = useDateAndTime();
 
+  const {admin} = useApp();
+  const companyName = admin?.companyName;
+
   return (
     <Box
       sx={{
-        px: 3,
+        px: { xs: 2, md: 3 },
         py: 1.5,
-        width: "97%",
+        width: "98%",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         bgcolor: "#EEF2FF",
         flexWrap: "wrap",
         gap: 1,
+        borderRadius: { xs: 2, md: 0 },
       }}
     >
       <Stack
@@ -42,7 +47,7 @@ const InfoBar: React.FC = () => {
           fontWeight={600}
           sx={{ color: "#665FC9", whiteSpace: "nowrap", fontSize: 13 }}
         >
-          vConstruct, Pune
+          { companyName}
         </Typography>
       </Stack>
 

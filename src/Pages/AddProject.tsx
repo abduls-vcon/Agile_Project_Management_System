@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -55,32 +55,47 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
   const [teamMembers, setTeamMembers] = useState<User[]>([]);
   const [createdDate, setCreatedDate] = useState(today);
 
-  const handleOwnerChange = (newOwnerId: number) => {
-    const selectedOwner = users.find((u) => u.id === newOwnerId);
-    if (!selectedOwner) return;
-    setTeamMembers((prev) => {
-      const already = prev.some((m) => m.id === newOwnerId);
-      return already ? prev : [...prev, selectedOwner];
-    });
-    setOwnerId(newOwnerId);
-  };
+  const handleOwnerChange = useCallback(
+    (newOwnerId: number) => {
+      const selectedOwner = users.find((user) => user.id === newOwnerId);
+      if (!selectedOwner) return;
 
-  const handleAddMembers = (userIds: number[]) => {
-    const toAdd = userIds
-      .map((id) => users.find((u) => u.id === id))
-      .filter((u): u is User => !!u && !teamMembers.some((m) => m.id === u.id));
-    if (toAdd.length > 0) setTeamMembers((prev) => [...prev, ...toAdd]);
-  };
+      setOwnerId(newOwnerId);
 
-  const handleRemoveMember = (id: number) => {
-    if (id === ownerId) {
-      alert("Cannot remove project owner.");
-      return;
-    }
-    setTeamMembers((prev) => prev.filter((m) => m.id !== id));
-  };
+      setTeamMembers((prevMembers) => {
+        if (prevMembers.some((member) => member.id === newOwnerId)) {
+          return prevMembers;
+        }
+        return [...prevMembers, selectedOwner];
+      });
+    },
+    [users],
+  );
 
-  const handleSave = () => {
+  const handleAddMembers = useCallback(
+    (userIds: number[]) => {
+      const toAdd = userIds
+        .map((id) => users.find((u) => u.id === id))
+        .filter(
+          (u): u is User => !!u && !teamMembers.some((m) => m.id === u.id),
+        );
+      if (toAdd.length > 0) setTeamMembers((prev) => [...prev, ...toAdd]);
+    },
+    [teamMembers],
+  );
+
+  const handleRemoveMember = useCallback(
+    (id: number) => {
+      if (id === ownerId) {
+        alert("Cannot remove project owner.");
+        return;
+      }
+      setTeamMembers((prev) => prev.filter((m) => m.id !== id));
+    },
+    [users, teamMembers],
+  );
+
+  const handleSave = useCallback(() => {
     if (!name || ownerId === "") return;
     const newProject: Project = {
       id: Date.now(),
@@ -100,11 +115,11 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
     setTeamMembers([]);
     setCreatedDate(today);
     onClose();
-  };
+  }, [users, teamMembers]);
 
   const availableUsers = useMemo(
     () => users.filter((u) => !teamMembers.some((m) => m.id === u.id)),
-    [users, teamMembers],
+    [users, teamMembers]
   );
 
   const headerColor = STATUS_HEADER[status] ?? "#2563EB";
@@ -209,7 +224,7 @@ const AddProject: React.FC<AddProjectProps> = ({ open, onClose }) => {
             sx={inputSx}
           >
             {users
-              .filter((u) => u.role === "Manager")
+              .filter((u) => u.role === "Manager" || u.role === "Admin")
               .map((u) => (
                 <MenuItem key={u.id} value={u.id}>
                   <Box display="flex" alignItems="center" gap={1}>

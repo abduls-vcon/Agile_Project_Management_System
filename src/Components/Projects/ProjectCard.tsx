@@ -87,7 +87,7 @@ const STATUS_HEADER: Record<string, string> = {
 };
 
 const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
-  const { users } = useApp();
+  const { users, currentUser } = useApp();
   const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
 
@@ -147,7 +147,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
             {project.name}
           </Typography>
 
-          <Edit
+          {["Admin", "Manager"].includes(currentUser?.role || "") && <Edit
             onClick={handleEditClick}
             sx={{
               cursor: "pointer",
@@ -156,7 +156,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(({ project }) => {
               flexShrink: 0,
               "&:hover": { color: "#fff" },
             }}
-          />
+          />}
         </Box>
 
         <CardContent sx={{ p: 2 }}>

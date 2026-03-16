@@ -31,7 +31,7 @@ const inputSx = {
 };
 
 const Board: React.FC = () => {
-  const { projects, updateProjectStatus } = useApp();
+  const { projects, updateProjectStatus, currentUser } = useApp();
   const [selectedProjectId, setSelectedProjectId] = useState<number>(
     projects.length > 0 ? projects[0].id : 0
   );
@@ -134,7 +134,7 @@ const Board: React.FC = () => {
               </FormControl>
             </Box>
 
-            <Button
+            {["Manager", "Tester"].includes(currentUser?.role || "") && <Button
               startIcon={<AddIcon />}
               onClick={() => setIsModalOpen(true)}
               sx={{
@@ -151,7 +151,7 @@ const Board: React.FC = () => {
               }}
             >
               Add Story
-            </Button>
+            </Button>}
 
             {isModalOpen && (
               <AddUserStory
@@ -185,7 +185,10 @@ const Board: React.FC = () => {
                 gap: 2,
                 px: 3,
                 py: 2,
-                overflowX: "auto",
+                overflowX: "auto", // Default for larger screens
+                "@media (max-width: 800px)": {
+                  flexDirection: "column",
+                },
                 "&::-webkit-scrollbar": { height: 6 },
                 "&::-webkit-scrollbar-thumb": { bgcolor: "#CBD5E1", borderRadius: 3 },
               }}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import {
   Checkbox,
   Typography,
   Chip,
+  Alert,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { useApp } from "../Context";
@@ -48,7 +49,7 @@ const inputSx = {
 };
 
 const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
-  const { addUserStory, projects } = useApp();
+  const { addUserStory, projects, currentUser } = useApp();
 
   const project = useMemo(
     () => projects.find((p) => p.id === projectId),
@@ -64,31 +65,61 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
   const [storyPoints, setStoryPoints] = useState<number>(0);
   const [dueDate, setDueDate] = useState("");
   const [checked, setChecked] = useState(false);
+  const [titleError, setTitleError] = useState(false);
+  const [descriptionError, setDescriptionError] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = () => {
-    if (!title.trim() || !description.trim()) return;
-    const newStory: UserStory = {
-      id: Date.now(),
-      title,
-      description,
-      status,
-      priority,
-      assignedTo,
-      dueDate,
-      storyPoints,
-      isBug: checked,
-    };
-    addUserStory(projectId, newStory);
-    setTitle("");
-    setDescription("");
-    setStatus("Backlog");
-    setChecked(false);
-    setPriority("Medium");
-    setAssignedTo(undefined);
-    setDueDate("");
-    setStoryPoints(0);
-    onClose();
+  useEffect(() => {
+    if (currentUser?.role === "Tester") {
+      setChecked(true);
+    }
+  }, [currentUser]);
+
+  const handleSubmit = useCallback(() => {
+  const isTitleValid = title.trim().length > 0;
+  const isDescValid = description.trim().length > 0;
+
+  setTitleError(!isTitleValid);
+  setDescriptionError(!isDescValid);
+  setSubmitError(null);
+
+  if (!isTitleValid || !isDescValid) return;
+
+  const newStory: UserStory = {
+    id: Date.now(),
+    title,
+    description,
+    status,
+    priority,
+    assignedTo,
+    createdDate: new Date().toISOString(),
+    dueDate: dueDate || undefined,
+    storyPoints,
+    isBug: checked,
+    comments: [],
   };
+
+  try {
+    addUserStory(projectId, newStory);
+  } catch (error) {
+    console.error("Failed to add user story:", error);
+    setSubmitError("An unexpected error occurred. Please try again.");
+    return;
+  }
+  onClose();
+}, [
+  title,
+  description,
+  status,
+  priority,
+  assignedTo,
+  dueDate,
+  storyPoints,
+  checked,
+  projectId,
+  addUserStory,
+  onClose
+]);
 
   return (
     <Dialog
@@ -151,13 +182,19 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
       </Box>
 
       <DialogContent sx={{ px: 3, pt: 2.5, pb: 1 }}>
+        {submitError && <Alert severity="error" sx={{ mb: 2 }}>{submitError}</Alert>}
         <Box display="flex" flexDirection="column" gap={2}>
           <TextField
             label="Title"
             fullWidth
             required
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            error={titleError}
+            helperText={titleError ? "Title is required" : ""}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (titleError) setTitleError(false);
+            }}
             sx={inputSx}
           />
 
@@ -168,7 +205,12 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
             multiline
             rows={4}
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            error={descriptionError}
+            helperText={descriptionError ? "Description is required" : ""}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              if (descriptionError) setDescriptionError(false);
+            }}
             sx={inputSx}
           />
 
@@ -177,6 +219,7 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
               <Checkbox
                 checked={checked}
                 onChange={(e) => setChecked(e.target.checked)}
+                disabled={currentUser?.role === "Tester"}
                 size="small"
               />
             }
@@ -322,13 +365,18 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
             type="number"
             value={storyPoints}
             onChange={(e) => {
-              const v = Number(e.target.value);
-              if (v >= 1 && v <= 13) setStoryPoints(v);
+              const val = e.target.value;
+              if (val === "") {
+                setStoryPoints(0);
+                return;
+              }
+              const v = parseInt(val, 10);
+              if (!isNaN(v) && v >= 0 && v <= 21) setStoryPoints(v);
             }}
             size="small"
             fullWidth
             sx={{ ...inputSx, maxWidth: 200 }}
-            InputProps={{ inputProps: { min: 1, max: 13 } }}
+            InputProps={{ inputProps: { min: 0, max: 21 } }}
           />
         </Box>
       </DialogContent>
@@ -358,10 +406,10 @@ const AddUserStory: React.FC<Props> = ({ open, onClose, projectId }) => {
             fontSize: 13,
             px: 3,
             background: "#665fc9",
-            boxShadow: `0 2px 12px #665fc9 40`,
+            boxShadow: `0 2px 12px rgba(102, 95, 201, 0.4)`,
             "&:hover": {
               filter: "brightness(0.9)",
-              boxShadow: `0 4px 16px #665fc9 60`,
+              boxShadow: `0 4px 16px rgba(102, 95, 201, 0.6)`,
             },
           }}
         >

@@ -1,286 +1,333 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Box,
-  Grid,
-  Card,
-  Avatar,
-  IconButton,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
   Typography,
+  Paper,
+  Grid,
+  IconButton,
+  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
-  TextField,
   DialogActions,
   Button,
+  TextField,
   MenuItem,
   Stack,
-  Chip,
 } from "@mui/material";
+import { useApp } from "../../Context";
+import type { User, Role } from "../../Models";
+import Avatar from "../Layout/Avatar";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CodeIcon from "@mui/icons-material/Code";
-import BugReportIcon from "@mui/icons-material/BugReport";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import { useApp } from "../../Context";
-import type { User } from "../../Models";
+import EmailIcon from "@mui/icons-material/Email";
+import { grey, red } from "@mui/material/colors";
 
-interface UserItemsProps {
+const ROLES: Role[] = ["Admin", "Manager", "Developer", "Tester"];
+
+const ROLE_COLORS: Record<Role, string> = {
+  Admin: "#665fc9",
+  Manager: "#ef4444",
+  Developer: "#3b82f6",
+  Tester: "#f59e0b",
+};
+
+interface Props {
   users: User[];
 }
 
-const ROLE_CONFIG: Record<string, { color: string; bg: string; border: string; iconColor: string }> = {
-  Developer: { color: "#1D4ED8", bg: "#DBEAFE", border: "#93C5FD", iconColor: "#2563EB" },
-  Tester:    { color: "#B45309", bg: "#FEF3C7", border: "#FCD34D", iconColor: "#D97706" },
-  Manager:   { color: "#6D28D9", bg: "#EDE9FE", border: "#C4B5FD", iconColor: "#7C3AED" },
-};
+const UserItems: React.FC<Props> = ({ users }) => {
+  const { currentUser, deleteUser, updateUser } = useApp();
+  const [editUser, setEditUser] = useState<User | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
-const roleIcon = (role: string) => {
-  const cfg = ROLE_CONFIG[role];
-  switch (role) {
-    case "Developer": return <CodeIcon sx={{ color: cfg?.iconColor, fontSize: 26 }} />;
-    case "Tester":    return <BugReportIcon sx={{ color: cfg?.iconColor, fontSize: 26 }} />;
-    case "Manager":   return <ManageAccountsIcon sx={{ color: cfg?.iconColor, fontSize: 26 }} />;
-    default:          return null;
-  }
-};
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<Role>("Developer");
 
-const inputSx = {
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "10px",
-    "&.Mui-focused fieldset": { borderColor: "#6366F1" },
-  },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#6366F1" },
-};
-
-const UserItems: React.FC<UserItemsProps> = ({ users }) => {
-  const { updateUser, deleteUser } = useApp();
-  const [open, setOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [formData, setFormData] = useState({ name: "", role: "", avatarColor: "" });
-
-  const handleOpen = (user: any) => {
-    setSelectedUser(user);
-    setFormData({ name: user.name, role: user.role, avatarColor: user.avatarColor });
-    setOpen(true);
-  };
-
-  const handleClose = () => setOpen(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleEditClick = (user: User) => {
+    setEditUser(user);
+    setName(user.name);
+    setEmail(user.email);
+    setRole(user.role);
   };
 
   const handleUpdate = () => {
-    if (selectedUser) {
-      updateUser({ ...selectedUser, ...formData });
-      handleClose();
+    if (editUser && name && email) {
+      updateUser({ ...editUser, name, email, role });
+      setEditUser(null);
     }
   };
 
-  if (users.length === 0) {
-    return (
-      <Box sx={{ my: 5, textAlign: "center" }}>
-        <Typography variant="h6" color="text.secondary">
-          No users added yet.
-        </Typography>
-      </Box>
-    );
-  }
+  const handleDelete = () => {
+    if (deleteId !== null) {
+      deleteUser(deleteId);
+      setDeleteId(null);
+    }
+  };
+
+const canEdit = useCallback((targetUser: User) => {
+  if (!currentUser) return false
+  if (currentUser.role === "Admin") return true
+  if (currentUser.role === "Manager" && ["Developer","Tester"].includes(targetUser.role))
+    return true
+  return false
+}, [currentUser])
+
+  const canDelete = useCallback((targetUser: User) => {
+    if (!currentUser) return false;
+    if (currentUser.id === targetUser.id) return false;
+    if (currentUser.role === "Admin") return true;
+    return false;
+  },[currentUser])
 
   return (
-    <Box sx={{ my: 1, p: 1 }}>
-      <Grid container spacing={2} justifyContent="center">
-        {users.map((user) => {
-          const roleCfg = ROLE_CONFIG[user.role] ?? { color: "#475569", bg: "#F1F5F9", border: "#E2E8F0", iconColor: "#64748B" };
-          return (
-            <Grid sx={{ xs: 12, sm: 6, md: 4, lg: 3, mx: 1 }} key={user.id}>
-              <Card
-                elevation={0}
+    <>
+      <Grid container spacing={3} sx={{ mt: 2 }}>
+        {users.map((user) => (
+          <Grid key={user.id} sx={{ xs:12, sm:6, md:4, lg:3}}>
+            <Paper
+              elevation={2}
+              sx={{
+                width: "165px",
+                p: 3,
+                borderRadius: 4,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                position: "relative",
+                transition: "all 0.3s ease",
+                border: "1px solid transparent",
+                bgcolor: "#fff",
+                overflow: "hidden",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: `0 12px 24px rgba(0,0,0,0.08)`,
+                  borderColor: ROLE_COLORS[user.role] || grey[300],
+                },
+              }}
+            >
+              <Box
                 sx={{
-                  display: "flex",
-                  px: 2,
-                  py: 1.5,
-                  borderRadius: 3,
-                  border: "1px solid",
-                  borderColor: roleCfg.border,
-                  borderLeft: `4px solid ${roleCfg.iconColor}`,
-                  height: 60,
-                  width: 500,
-                  boxShadow: `0 2px 10px ${roleCfg.iconColor}22`,
-                  transition: "transform 0.3s, box-shadow 0.3s",
-                  "&:hover": {
-                    transform: "translateY(-3px)",
-                    boxShadow: `0 8px 24px ${roleCfg.iconColor}33`,
-                  },
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 6,
+                  bgcolor: ROLE_COLORS[user.role] || grey[400],
+                }}
+              />
+
+              <Box sx={{ position: "absolute", top: 16, right: 16 }}>
+                <Chip
+                  label={user.role}
+                  size="small"
+                  sx={{
+                    bgcolor: `${ROLE_COLORS[user.role]}15`,
+                    color: ROLE_COLORS[user.role],
+                    fontWeight: 700,
+                    fontSize: "0.65rem",
+                    height: 22,
+                  }}
+                />
+              </Box>
+
+              <Box sx={{ mb: 2, mt: 2 }}>
+                <Avatar user={user} size={80} />
+              </Box>
+
+              <Typography
+                variant="h6"
+                fontWeight={700}
+                sx={{
+                  color: "#1e293b",
+                  mb: 0.5,
+                  textAlign: "center",
+                  fontSize: "1.05rem",
                 }}
               >
-                <ListItem
-                  disableGutters
-                  sx={{ display: "flex", alignItems: "center", width: "100%" }}
-                  secondaryAction={
-                    <Stack direction="row" spacing={0.5}>
-                      <IconButton
-                        edge="end"
-                        aria-label="edit"
-                        onClick={() => handleOpen(user)}
-                        sx={{
-                          color: "#6366F1",
-                          bgcolor: "#EEF2FF",
-                          width: 30, height: 30,
-                          "&:hover": { bgcolor: "#C7D2FE" },
-                        }}
-                      >
-                        <EditIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() => deleteUser(user.id)}
-                        sx={{
-                          color: "#EF4444",
-                          bgcolor: "#FEE2E2",
-                          width: 30, height: 30,
-                          "&:hover": { bgcolor: "#FECACA" },
-                        }}
-                      >
-                        <DeleteIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
-                    </Stack>
-                  }
+                {user.name}
+              </Typography>
+
+              <Stack
+                direction="row"
+                spacing={0.8}
+                alignItems="center"
+                sx={{ mb: 3, color: grey[500] }}
+              >
+                <EmailIcon sx={{ fontSize: 15 }} />
+                <Typography
+                  variant="body2"
+                  sx={{ fontSize: "0.8rem", fontWeight: 500 }}
                 >
-                  <ListItemAvatar>
-                    <Avatar
+                  {user.email}
+                </Typography>
+              </Stack>
+
+              {(canEdit(user) || canDelete(user)) && (
+                <Stack direction="row" spacing={1} sx={{ width: "100%", mt: "auto" }}>
+                  {canEdit(user) && (
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      size="small"
+                      startIcon={<EditIcon sx={{ fontSize: 18 }} />}
+                      onClick={() => handleEditClick(user)}
                       sx={{
-                        bgcolor: user.avatarColor,
-                        fontWeight: "bold",
-                        width: 40,
-                        height: 40,
-                        fontSize: "1rem",
-                        boxShadow: `0 0 0 2px #fff, 0 0 0 3.5px ${roleCfg.border}`,
+                        borderRadius: 2,
+                        textTransform: "none",
+                        fontSize: "0.85rem",
+                        fontWeight: 600,
+                        color: ROLE_COLORS[user.role],
+                        borderColor: `${ROLE_COLORS[user.role]}50`,
+                        "&:hover": {
+                          borderColor: ROLE_COLORS[user.role],
+                          bgcolor: `${ROLE_COLORS[user.role]}08`,
+                        },
                       }}
                     >
-                      {user.name.charAt(0).toUpperCase()}
-                    </Avatar>
-                  </ListItemAvatar>
+                      Edit
+                    </Button>
+                  )}
 
-                  <ListItemText
-                    sx={{ ml: 2 }}
-                    primary={
-                      <Typography sx={{ fontSize: 15, fontWeight: 700, color: "#1E293B" }}>
-                        {user.name}
-                      </Typography>
-                    }
-                    secondary={
-                      <Chip
-                        label={user.role}
-                        size="small"
-                        sx={{
-                          mt: 0.3,
-                          height: 18,
-                          fontSize: 10,
-                          fontWeight: 700,
-                          bgcolor: roleCfg.bg,
-                          color: roleCfg.color,
-                          border: `1px solid ${roleCfg.border}`,
-                          "& .MuiChip-label": { px: 1 },
-                        }}
-                      />
-                    }
-                  />
-
-                  <Box sx={{ ml: "auto", mr: 8 }}>{roleIcon(user.role)}</Box>
-                </ListItem>
-              </Card>
-            </Grid>
-          );
-        })}
+                  {canDelete(user) && (
+                    <IconButton
+                      size="small"
+                      onClick={() => setDeleteId(user.id)}
+                      sx={{
+                        color: red[400],
+                        bgcolor: red[50],
+                        borderRadius: 2,
+                        border: `1px solid ${red[100]}`,
+                        "&:hover": { bgcolor: red[100], color: red[600] },
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </Stack>
+              )}
+            </Paper>
+          </Grid>
+        ))}
       </Grid>
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" sx={{borderRadius:5}}>
-        <DialogTitle
-          sx={{
-            fontWeight: 700,
-            fontSize: 16,
-            bgcolor: "#665fc9",
-            color: "#fff",
-            borderBottom: "1px solid #C7D2FE",
-            mb:2,
-            
-          }}
-        >
+      <Dialog
+        open={!!editUser}
+        onClose={() => setEditUser(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
           Edit User
         </DialogTitle>
 
-        <DialogContent sx={{ bgcolor: "#FAFAFA" }}>
-          <TextField
-            margin="dense"
-            label="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            fullWidth
-            sx={inputSx}
-          />
-          <TextField
-            margin="dense"
-            label="Role"
-            name="role"
-            select
-            value={formData.role}
-            onChange={handleChange}
-            fullWidth
-            sx={inputSx}
+        <DialogContent sx={{ pt: 1 }}>
+          <Box
+            component="form"
+            sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2.5 }}
           >
-            <MenuItem value="Developer">Developer</MenuItem>
-            <MenuItem value="Tester">Tester</MenuItem>
-            <MenuItem value="Manager">Manager</MenuItem>
-          </TextField>
-          <TextField
-            margin="dense"
-            label="Avatar Color"
-            name="avatarColor"
-            value={formData.avatarColor}
-            onChange={handleChange}
-            type="color"
-            fullWidth
-            sx={{ mt: 1, ...inputSx }}
-          />
+            <TextField
+              label="Full Name"
+              fullWidth
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              size="small"
+              InputProps={{ sx: { borderRadius: 2 } }}
+            />
+
+            <TextField
+              label="Email Address"
+              fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              size="small"
+              InputProps={{ sx: { borderRadius: 2 } }}
+            />
+
+            <TextField
+              select
+              label="Role"
+              fullWidth
+              value={role}
+              onChange={(e) => setRole(e.target.value as Role)}
+              size="small"
+              InputProps={{ sx: { borderRadius: 2 } }}
+            >
+              {(currentUser?.role === "Manager"
+                ? ROLES.filter((r) => r !== "Admin" && r !== "Manager")
+                : ROLES
+              ).map((r) => (
+                <MenuItem key={r} value={r} sx={{ fontSize: "0.9rem" }}>
+                  {r}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, py: 2, bgcolor: "#FAFAFA", borderTop: "1px solid #E2E8F0", gap: 1 }}>
+        <DialogActions sx={{ p: 2.5, pt: 1 }}>
           <Button
-            onClick={handleClose}
-            sx={{
-              borderRadius: "10px",
-              textTransform: "none",
-              fontWeight: 600,
-              color: "#64748B",
-              border: "1px solid #E2E8F0",
-              "&:hover": { bgcolor: "#F1F5F9" },
-            }}
+            onClick={() => setEditUser(null)}
+            sx={{ color: grey[600], fontWeight: 600, textTransform: "none" }}
           >
             Cancel
           </Button>
+
           <Button
             onClick={handleUpdate}
             variant="contained"
             sx={{
-              borderRadius: "10px",
+              bgcolor: "#665fc9",
+              borderRadius: 2,
               textTransform: "none",
               fontWeight: 700,
-              bgcolor: "#665fc9",
-              boxShadow: "none",
-              "&:hover": { bgcolor: "#665fc9", boxShadow: "none" },
+              px: 3,
+              "&:hover": { bgcolor: "#554eb0" },
             }}
           >
-            Update
+            Save Changes
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+
+      <Dialog
+        open={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
+          Confirm Delete
+        </DialogTitle>
+
+        <DialogContent>
+          <Typography color="text.secondary" fontSize="0.95rem">
+            Are you sure you want to delete this user? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2.5 }}>
+          <Button
+            onClick={() => setDeleteId(null)}
+            sx={{ color: grey[600], fontWeight: 600, textTransform: "none" }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            onClick={handleDelete}
+            variant="contained"
+            color="error"
+            sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700, px: 3 }}
+          >
+            Delete User
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
