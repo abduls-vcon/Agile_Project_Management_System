@@ -20,7 +20,7 @@ export interface User{
     email: string;
     role: Role,
     avatarColor?:string,
-    password?: string; // NOTE: In a real app, this would never be stored in plaintext
+    password?: string; 
 }
 
 

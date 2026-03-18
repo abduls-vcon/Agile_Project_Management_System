@@ -8,7 +8,9 @@ import Board from "../src/Pages/Board"
 import ErrorComponent from "./Components/Layout/ErrorComponent"
 import AnalyticsDashboard from "./Pages/AnalyticsDashboard"
 import RegisterPage from "./Pages/RegisterationPage"
+import AuditLogView from "./Pages/AuditLogView"
 import LoginPage from "./Pages/LoginPage"
+import ForgetPasswordPage from "./Pages/ForgetPasswordPage"
 
 
 const App : React.FC = () => {
@@ -25,6 +27,8 @@ const App : React.FC = () => {
           <Route path="/board/:id" element={<KanbanBoard/>}/>
           <Route path="/boards/:id" element={<Board/>}/>
           <Route path="/analytics/:id" element={<AnalyticsDashboard/>}/>
+          <Route path="/audit-logs/:id" element={<AuditLogView/>}/>
+          <Route path="/forgetpassword" element={<ForgetPasswordPage/>}/>
           <Route path="*" element={<ErrorComponent title="Page Not Found"/>}/>
         </Routes>
       </BrowserRouter>
